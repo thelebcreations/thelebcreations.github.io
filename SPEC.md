@@ -204,13 +204,10 @@ import tailwind from '@astrojs/tailwind';
 import tinacms from '@tinacms/astro';
 
 export default defineConfig({
-  site: 'https://username.github.io',
-  base: '/repo-name',           // ⚠️ Requis pour GitHub Pages subdirectory
+  site: 'https://thelebcreations.github.io',
+  // pas de `base` — le site est servi à la racine
   output: 'static',
-  integrations: [
-    tailwind(),
-    tinacms(),
-  ],
+  integrations: [tailwind(), tinacms()],
 });
 ```
 
