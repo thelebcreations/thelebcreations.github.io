@@ -1,0 +1,176 @@
+---
+import StatusBadge from './StatusBadge.astro';
+import type { ArticleStatut, ArticleCategorie, ArticleTheme } from '../content.config';
+
+interface Props {
+  slug:      string;
+  titre:     string;
+  prix:      number;
+  statut:    ArticleStatut;
+  images:    string[];
+  categorie: ArticleCategorie;
+  theme:     ArticleTheme;
+  quantite:  number;
+}
+
+const { slug, titre, prix, statut, images, categorie, theme, quantite } = Astro.props;
+
+const isSold = statut === 'vendu';
+const image  = images[0];
+---
+
+<article class={`article-card ${isSold ? 'is-sold' : ''}`}>
+  <a href={`/boutique/${slug}`} class="card-link" tabindex={isSold ? -1 : 0}>
+
+    <!-- Image -->
+    <div class="card-image-wrapper">
+      <img
+        src={image}
+        alt={titre}
+        class="card-image"
+        loading="lazy"
+        decoding="async"
+      />
+      {isSold && <div class="sold-overlay">Vendu</div>}
+    </div>
+
+    <!-- Contenu -->
+    <div class="card-body">
+      <div class="card-header">
+        <h2 class="card-titre">{titre}</h2>
+        <StatusBadge statut={statut} />
+      </div>
+
+      <div class="card-meta">
+        <span class="card-prix">{prix.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+        {statut === 'disponible' && quantite > 1 && (
+          <span class="card-quantite">{quantite} disponibles</span>
+        )}
+      </div>
+
+      <div class="card-tags">
+        <span class="card-tag">{categorie.replace(/-/g, ' ')}</span>
+        <span class="card-tag">{theme}</span>
+      </div>
+    </div>
+
+  </a>
+</article>
+
+<style>
+  .article-card {
+    background:    var(--color-surface, #fff);
+    border:        1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.75rem;
+    overflow:      hidden;
+    transition:    transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .article-card:not(.is-sold):hover {
+    transform:  translateY(-3px);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text, #2A2520) 8%, transparent);
+  }
+
+  .article-card.is-sold {
+    opacity: 0.6;
+  }
+
+  .card-link {
+    display:         block;
+    text-decoration: none;
+    color:           inherit;
+    height:          100%;
+  }
+
+  /* Image */
+  .card-image-wrapper {
+    position:       relative;
+    aspect-ratio:   4 / 3;
+    overflow:       hidden;
+    background:     var(--color-bg, #FAF7F2);
+  }
+
+  .card-image {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .article-card:not(.is-sold):hover .card-image {
+    transform: scale(1.04);
+  }
+
+  .sold-overlay {
+    position:        absolute;
+    inset:           0;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    background:      color-mix(in srgb, #FAF7F2 60%, transparent);
+    font-family:     var(--font-display, serif);
+    font-size:       1.25rem;
+    font-style:      italic;
+    color:           var(--color-text-muted, #7A6E65);
+    letter-spacing:  0.05em;
+  }
+
+  /* Corps */
+  .card-body {
+    padding: 1rem 1.125rem 1.125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-header {
+    display:     flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap:         0.5rem;
+  }
+
+  .card-titre {
+    font-family:  var(--font-display, serif);
+    font-size:    1.0625rem;
+    font-weight:  600;
+    line-height:  1.3;
+    margin:       0;
+    flex:         1;
+  }
+
+  .card-meta {
+    display:     flex;
+    align-items: baseline;
+    gap:         0.625rem;
+  }
+
+  .card-prix {
+    font-size:   1.0625rem;
+    font-weight: 500;
+    color:       var(--color-accent, #C4714A);
+  }
+
+  .card-quantite {
+    font-size: 0.75rem;
+    color:     var(--color-text-muted, #7A6E65);
+  }
+
+  .card-tags {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       0.375rem;
+    margin-top: 0.125rem;
+  }
+
+  .card-tag {
+    font-size:        0.6875rem;
+    letter-spacing:   0.04em;
+    text-transform:   capitalize;
+    color:            var(--color-text-muted, #7A6E65);
+    background:       var(--color-bg, #FAF7F2);
+    border:           1px solid var(--color-border, #E8E0D6);
+    border-radius:    999px;
+    padding:          0.15em 0.6em;
+  }
+</style>

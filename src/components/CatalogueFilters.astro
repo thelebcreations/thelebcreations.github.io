@@ -1,0 +1,229 @@
+---
+// Les valeurs des options sont passées depuis la page catalogue
+// pour éviter de les dupliquer ici.
+
+interface Props {
+  categories: string[];
+  themes:     string[];
+}
+
+const { categories, themes } = Astro.props;
+
+const statuts = [
+  { value: 'disponible', label: 'Disponible' },
+  { value: 'reserve',    label: 'Réservé'    },
+  { value: 'vendu',      label: 'Vendu'      },
+];
+
+const tris = [
+  { value: 'prix-asc',  label: 'Prix croissant'    },
+  { value: 'prix-desc', label: 'Prix décroissant'   },
+];
+---
+
+<div class="filters-bar" id="filters-bar">
+
+  <!-- Catégorie -->
+  <div class="filter-group">
+    <label for="filter-categorie" class="filter-label">Catégorie</label>
+    <select id="filter-categorie" class="filter-select" data-filter="categorie">
+      <option value="">Toutes</option>
+      {categories.map(c => (
+        <option value={c}>{c.replace(/-/g, ' ')}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Thème -->
+  <div class="filter-group">
+    <label for="filter-theme" class="filter-label">Thème</label>
+    <select id="filter-theme" class="filter-select" data-filter="theme">
+      <option value="">Tous</option>
+      {themes.map(t => (
+        <option value={t}>{t}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Statut -->
+  <div class="filter-group">
+    <label for="filter-statut" class="filter-label">Statut</label>
+    <select id="filter-statut" class="filter-select" data-filter="statut">
+      <option value="">Tous</option>
+      {statuts.map(s => (
+        <option value={s.value}>{s.label}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Tri -->
+  <div class="filter-group">
+    <label for="filter-tri" class="filter-label">Trier par</label>
+    <select id="filter-tri" class="filter-select" id="filter-tri">
+      <option value="">—</option>
+      {tris.map(t => (
+        <option value={t.value}>{t.label}</option>
+      ))}
+    </select>
+  </div>
+
+  <!-- Réinitialiser -->
+  <button id="reset-filters" class="reset-btn" hidden>
+    Effacer les filtres
+  </button>
+
+</div>
+
+<!-- Compteur de résultats -->
+<p class="results-count" id="results-count" aria-live="polite"></p>
+
+<script>
+  const grid        = document.getElementById('catalogue-grid')   as HTMLElement;
+  const resetBtn    = document.getElementById('reset-filters')    as HTMLButtonElement;
+  const countEl     = document.getElementById('results-count')    as HTMLParagraphElement;
+  const filterSelects = document.querySelectorAll<HTMLSelectElement>('[data-filter]');
+  const triSelect   = document.getElementById('filter-tri')       as HTMLSelectElement;
+
+  // Récupère tous les articles une seule fois
+  const allCards = (): HTMLElement[] =>
+    Array.from(grid.querySelectorAll<HTMLElement>('[data-slug]'));
+
+  function applyFilters() {
+    const activeFilters: Record<string, string> = {};
+
+    filterSelects.forEach(sel => {
+      const key = sel.dataset.filter!;
+      if (sel.value) activeFilters[key] = sel.value;
+    });
+
+    const triValue = triSelect.value;
+    const hasActiveFilter = Object.keys(activeFilters).length > 0 || triValue !== '';
+    resetBtn.hidden = !hasActiveFilter;
+
+    // Filtrer
+    let visible = allCards().filter(card => {
+      return Object.entries(activeFilters).every(([key, value]) => {
+        return card.dataset[key] === value;
+      });
+    });
+
+    // Masquer les non-visibles
+    allCards().forEach(card => { card.hidden = true; });
+    visible.forEach(card => { card.hidden = false; });
+
+    // Trier (réordonner dans le DOM)
+    if (triValue === 'prix-asc' || triValue === 'prix-desc') {
+      visible.sort((a, b) => {
+        const pa = parseFloat(a.dataset.prix ?? '0');
+        const pb = parseFloat(b.dataset.prix ?? '0');
+        return triValue === 'prix-asc' ? pa - pb : pb - pa;
+      });
+      visible.forEach(card => grid.appendChild(card));
+    }
+
+    // Mettre à jour le compteur
+    const total = allCards().length;
+    const shown = visible.length;
+    countEl.textContent = shown === total
+      ? `${total} article${total > 1 ? 's' : ''}`
+      : `${shown} article${shown > 1 ? 's' : ''} sur ${total}`;
+  }
+
+  // Écouter les changements sur tous les selects
+  filterSelects.forEach(sel => sel.addEventListener('change', applyFilters));
+  triSelect.addEventListener('change', applyFilters);
+
+  // Réinitialiser
+  resetBtn.addEventListener('click', () => {
+    filterSelects.forEach(sel => { sel.value = ''; });
+    triSelect.value = '';
+    applyFilters();
+  });
+
+  // Afficher le compteur initial
+  applyFilters();
+</script>
+
+<style>
+  .filters-bar {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       1rem;
+    padding:   1.25rem 1.5rem;
+    background: var(--color-surface, #fff);
+    border:    1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .filter-group {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.3rem;
+    flex:           1;
+    min-width:      10rem;
+  }
+
+  .filter-label {
+    font-size:      0.7rem;
+    font-weight:    500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color:          var(--color-text-muted, #7A6E65);
+  }
+
+  .filter-select {
+    appearance:    none;
+    background:    var(--color-bg, #FAF7F2);
+    border:        1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.375rem;
+    padding:       0.45rem 2rem 0.45rem 0.75rem;
+    font-size:     0.875rem;
+    font-family:   var(--font-body, sans-serif);
+    color:         var(--color-text, #2A2520);
+    cursor:        pointer;
+    width:         100%;
+
+    /* Flèche custom */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237A6E65' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat:   no-repeat;
+    background-position: right 0.6rem center;
+  }
+
+  .filter-select:focus {
+    outline:      2px solid var(--color-accent, #C4714A);
+    outline-offset: 2px;
+    border-color: var(--color-accent, #C4714A);
+  }
+
+  .reset-btn {
+    align-self:    flex-end;
+    background:    none;
+    border:        1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.375rem;
+    padding:       0.45rem 0.875rem;
+    font-size:     0.8125rem;
+    font-family:   var(--font-body, sans-serif);
+    color:         var(--color-text-muted, #7A6E65);
+    cursor:        pointer;
+    transition:    border-color 0.2s, color 0.2s;
+    white-space:   nowrap;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--color-accent, #C4714A);
+    color:        var(--color-accent, #C4714A);
+  }
+
+  .results-count {
+    font-size:  0.8125rem;
+    color:      var(--color-text-muted, #7A6E65);
+    margin:     0 0 1.5rem;
+    min-height: 1.2em;
+  }
+
+  @media (max-width: 640px) {
+    .filter-group { min-width: calc(50% - 0.5rem); }
+  }
+</style>

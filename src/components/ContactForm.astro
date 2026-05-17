@@ -1,0 +1,356 @@
+---
+// Pas de logique serveur — formulaire entièrement géré côté client via EmailJS
+---
+
+<form id="contact-form" class="contact-form" novalidate>
+
+  <!-- Nom -->
+  <div class="field-group">
+    <label for="nom" class="field-label">
+      Nom <span class="required" aria-hidden="true">*</span>
+    </label>
+    <input
+      type="text"
+      id="nom"
+      name="nom"
+      class="field-input"
+      required
+      autocomplete="name"
+      placeholder="Votre nom"
+    />
+    <span class="field-error" id="error-nom" aria-live="polite"></span>
+  </div>
+
+  <!-- Email -->
+  <div class="field-group">
+    <label for="email" class="field-label">
+      Email <span class="required" aria-hidden="true">*</span>
+    </label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      class="field-input"
+      required
+      autocomplete="email"
+      placeholder="votre@email.com"
+    />
+    <span class="field-error" id="error-email" aria-live="polite"></span>
+  </div>
+
+  <!-- Téléphone (optionnel) -->
+  <div class="field-group">
+    <label for="telephone" class="field-label">
+      Téléphone <span class="optional">(optionnel)</span>
+    </label>
+    <input
+      type="tel"
+      id="telephone"
+      name="telephone"
+      class="field-input"
+      autocomplete="tel"
+      placeholder="+33 6 00 00 00 00"
+    />
+  </div>
+
+  <!-- Sujet -->
+  <div class="field-group">
+    <label for="sujet" class="field-label">
+      Sujet <span class="required" aria-hidden="true">*</span>
+    </label>
+    <input
+      type="text"
+      id="sujet"
+      name="sujet"
+      class="field-input"
+      required
+      placeholder="Sujet de votre message"
+    />
+    <span class="field-error" id="error-sujet" aria-live="polite"></span>
+  </div>
+
+  <!-- Message -->
+  <div class="field-group">
+    <label for="message" class="field-label">
+      Message <span class="required" aria-hidden="true">*</span>
+    </label>
+    <textarea
+      id="message"
+      name="message"
+      class="field-input field-textarea"
+      required
+      rows="5"
+      placeholder="Votre message…"
+    ></textarea>
+    <span class="field-error" id="error-message" aria-live="polite"></span>
+  </div>
+
+  <!-- Mentions -->
+  <p class="form-mention">
+    Les champs marqués <span class="required" aria-hidden="true">*</span> sont obligatoires.
+  </p>
+
+  <!-- Submit -->
+  <button type="submit" id="submit-btn" class="submit-btn">
+    <span id="btn-label">Envoyer le message</span>
+    <span id="btn-spinner" class="spinner" hidden aria-hidden="true"></span>
+  </button>
+
+  <!-- Feedback -->
+  <div id="form-success" class="form-feedback form-success" hidden role="alert">
+    ✓ Message envoyé ! Nous vous répondrons dans les plus brefs délais.
+  </div>
+  <div id="form-error" class="form-feedback form-error" hidden role="alert">
+    Une erreur est survenue. Veuillez réessayer ou nous contacter directement par email.
+  </div>
+
+</form>
+
+<script>
+  import emailjs from '@emailjs/browser';
+
+  const SERVICE_ID  = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID  as string;
+  const TEMPLATE_ID = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID as string;
+  const PUBLIC_KEY  = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY  as string;
+
+  emailjs.init(PUBLIC_KEY);
+
+  // -------------------------------------------------------------------------
+  // Pré-remplir le sujet depuis l'URL (?sujet=... ou ?item=...)
+  // Ex: /contact?sujet=Int%C3%A9r%C3%AAt+pour+%3A+Bavoir+Espace
+  // -------------------------------------------------------------------------
+  const params    = new URLSearchParams(window.location.search);
+  const sujetInput = document.getElementById('sujet') as HTMLInputElement;
+
+  const sujetParam = params.get('sujet');
+  if (sujetParam && sujetInput) {
+    sujetInput.value = decodeURIComponent(sujetParam);
+  }
+
+  // -------------------------------------------------------------------------
+  // Validation simple
+  // -------------------------------------------------------------------------
+  function validateForm(form: HTMLFormElement): boolean {
+    let valid = true;
+
+    const fields: Array<{ id: string; errorId: string; message: string }> = [
+      { id: 'nom',     errorId: 'error-nom',     message: 'Veuillez indiquer votre nom.'     },
+      { id: 'email',   errorId: 'error-email',   message: 'Veuillez indiquer un email valide.' },
+      { id: 'sujet',   errorId: 'error-sujet',   message: 'Veuillez indiquer un sujet.'       },
+      { id: 'message', errorId: 'error-message', message: 'Veuillez écrire votre message.'    },
+    ];
+
+    fields.forEach(({ id, errorId, message }) => {
+      const input = form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`#${id}`)!;
+      const error = document.getElementById(errorId)!;
+
+      if (!input.value.trim()) {
+        error.textContent = message;
+        input.classList.add('is-invalid');
+        valid = false;
+      } else {
+        error.textContent = '';
+        input.classList.remove('is-invalid');
+      }
+    });
+
+    // Validation email basique
+    const emailInput = form.querySelector<HTMLInputElement>('#email')!;
+    const emailError = document.getElementById('error-email')!;
+    if (emailInput.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+      emailError.textContent = 'Format d\'email invalide.';
+      emailInput.classList.add('is-invalid');
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  // -------------------------------------------------------------------------
+  // Soumission
+  // -------------------------------------------------------------------------
+  const form      = document.getElementById('contact-form')  as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn')    as HTMLButtonElement;
+  const btnLabel  = document.getElementById('btn-label')     as HTMLSpanElement;
+  const btnSpinner = document.getElementById('btn-spinner')  as HTMLSpanElement;
+  const successEl = document.getElementById('form-success')  as HTMLDivElement;
+  const errorEl   = document.getElementById('form-error')    as HTMLDivElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Masquer les feedbacks précédents
+    successEl.hidden = true;
+    errorEl.hidden   = true;
+
+    if (!validateForm(form)) return;
+
+    // État chargement
+    submitBtn.disabled   = true;
+    btnLabel.textContent = 'Envoi en cours…';
+    btnSpinner.hidden    = false;
+
+    try {
+      await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
+      successEl.hidden = false;
+      form.reset();
+      sujetInput.value = '';
+      successEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch {
+      errorEl.hidden = false;
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } finally {
+      submitBtn.disabled   = false;
+      btnLabel.textContent = 'Envoyer le message';
+      btnSpinner.hidden    = true;
+    }
+  });
+
+  // Nettoyer l'erreur au focus
+  form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('.field-input').forEach(input => {
+    input.addEventListener('input', () => {
+      input.classList.remove('is-invalid');
+      const errorId = `error-${input.id}`;
+      const error   = document.getElementById(errorId);
+      if (error) error.textContent = '';
+    });
+  });
+</script>
+
+<style>
+  .contact-form {
+    display:        flex;
+    flex-direction: column;
+    gap:            1.25rem;
+    max-width:      36rem;
+  }
+
+  .field-group {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.35rem;
+  }
+
+  .field-label {
+    font-size:   0.8125rem;
+    font-weight: 500;
+    color:       var(--color-text, #2A2520);
+  }
+
+  .required { color: var(--color-accent, #C4714A); }
+
+  .optional {
+    font-size:  0.75rem;
+    font-weight: 400;
+    color:      var(--color-text-muted, #7A6E65);
+  }
+
+  .field-input {
+    appearance:    none;
+    width:         100%;
+    background:    var(--color-surface, #fff);
+    border:        1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.5rem;
+    padding:       0.6rem 0.875rem;
+    font-size:     0.9375rem;
+    font-family:   var(--font-body, sans-serif);
+    color:         var(--color-text, #2A2520);
+    transition:    border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field-input::placeholder {
+    color: color-mix(in srgb, var(--color-text-muted, #7A6E65) 60%, transparent);
+  }
+
+  .field-input:focus {
+    outline:      none;
+    border-color: var(--color-accent, #C4714A);
+    box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-accent, #C4714A) 12%, transparent);
+  }
+
+  .field-input.is-invalid {
+    border-color: #C0392B;
+    box-shadow:   0 0 0 3px color-mix(in srgb, #C0392B 10%, transparent);
+  }
+
+  .field-textarea {
+    resize:     vertical;
+    min-height: 8rem;
+  }
+
+  .field-error {
+    font-size: 0.75rem;
+    color:     #C0392B;
+    min-height: 1em;
+  }
+
+  .form-mention {
+    font-size:  0.75rem;
+    color:      var(--color-text-muted, #7A6E65);
+    margin:     0;
+  }
+
+  /* Bouton */
+  .submit-btn {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             0.5rem;
+    align-self:      flex-start;
+    background:      var(--color-accent, #C4714A);
+    color:           #fff;
+    border:          none;
+    border-radius:   0.5rem;
+    padding:         0.7rem 1.75rem;
+    font-size:       0.9375rem;
+    font-family:     var(--font-body, sans-serif);
+    font-weight:     500;
+    cursor:          pointer;
+    transition:      background 0.2s, transform 0.1s;
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--color-accent-hover, #A85C38);
+  }
+
+  .submit-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor:  not-allowed;
+  }
+
+  /* Spinner */
+  .spinner {
+    width:  1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Feedbacks */
+  .form-feedback {
+    padding:       0.875rem 1rem;
+    border-radius: 0.5rem;
+    font-size:     0.9rem;
+    line-height:   1.5;
+  }
+
+  .form-success {
+    background: #EDFAF3;
+    color:      #2D7A52;
+    border:     1px solid #B2E8CC;
+  }
+
+  .form-error {
+    background: #FEF0EE;
+    color:      #C0392B;
+    border:     1px solid #F5C6C2;
+  }
+</style>

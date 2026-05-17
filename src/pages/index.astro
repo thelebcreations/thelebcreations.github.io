@@ -1,17 +1,36 @@
 ---
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getEntry, getEntries } from 'astro:content';
 
+// Charger le singleton accueil
+const accueil = await getEntry('accueil', 'accueil');
+const refs = accueil.data.articlesVedette ?? [];
+
+// Résoudre les slugs en entrées complètes
+const articlesVedette = await Promise.all(
+  refs.map(({ article }) => getEntry('article', article))
+).then(entries => entries.filter(Boolean));
 ---
+<Base titre="Accueil">
+  <!-- Hero section -->
+  <section>
+    <h1>TheLeb Créations</h1>
+    <p>Créations faites main avec amour.</p>
+    <a href="/boutique" class="btn btn-primary">Voir la boutique</a>
+  </section>
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+  <!-- Articles en vedette -->
+  <section>
+    <h2>Nos créations</h2>
+    <div class="grid ...">
+      {articlesVedette.map(article => (
+        <ArticleCard
+          slug={article.id}
+          {...article.data}
+        />
+      ))}
+    </div>
+    <a href="/boutique">Voir tout le catalogue →</a>
+  </section>
+</Base>

@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+
+const aPropos = await getEntry('aPropos', 'a-propos');
+const { Content } = await render(aPropos);
+const { nom, photo } = aPropos.data;
+---
+<Base titre="À propos">
+  <h1>{nom}</h1>
+  {photo && <img src={photo} alt={`Photo de ${nom}`} />}
+  <Content />
+</Base>

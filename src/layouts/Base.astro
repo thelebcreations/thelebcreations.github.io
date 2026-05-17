@@ -1,3 +1,370 @@
 ---
 import '../styles/global.css';
+
+interface Props {
+  titre: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  titre,
+  description = 'Créations faites main avec amour.',
+  image,
+} = Astro.props;
+
+const SITE_TITLE = 'TheLeb Créations';
+const pageTitle   = titre === SITE_TITLE ? titre : `${titre} — ${SITE_TITLE}`;
+
+const nav = [
+  { href: '/boutique',  label: 'Boutique'  },
+  { href: '/a-propos',  label: 'À propos'  },
+  { href: '/contact',   label: 'Contact'   },
+];
 ---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+
+    <!-- SEO -->
+    <meta name="description" content={description} />
+    <meta property="og:title"       content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type"        content="website" />
+    {image && <meta property="og:image" content={image} />}
+
+    <!-- Typographie -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Navigation                                                          -->
+    <!-- ------------------------------------------------------------------ -->
+    <header class="site-header">
+      <nav class="site-nav">
+
+        <!-- Marque -->
+        <a href="/" class="brand" aria-label="Accueil TheLeb Créations">
+          TheLeb <em>Créations</em>
+        </a>
+
+        <!-- Liens desktop -->
+        <ul class="nav-links" role="list">
+          {nav.map(({ href, label }) => (
+            <li>
+              <a href={href} class="nav-link">{label}</a>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Bouton menu mobile -->
+        <button
+          class="nav-toggle"
+          aria-label="Ouvrir le menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+      </nav>
+
+      <!-- Menu mobile -->
+      <div id="mobile-menu" class="mobile-menu" hidden>
+        <ul role="list">
+          {nav.map(({ href, label }) => (
+            <li><a href={href}>{label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </header>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Contenu principal                                                   -->
+    <!-- ------------------------------------------------------------------ -->
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Pied de page                                                        -->
+    <!-- ------------------------------------------------------------------ -->
+    <footer class="site-footer">
+      <p class="footer-brand">TheLeb <em>Créations</em></p>
+      <p class="footer-tagline">Chaque pièce est unique, faite avec soin.</p>
+      <a href="/contact" class="footer-contact">Nous contacter</a>
+      <p class="footer-copy">© {new Date().getFullYear()} TheLeb Créations</p>
+    </footer>
+
+  </body>
+</html>
+
+<!-- -------------------------------------------------------------------- -->
+<!-- Menu mobile — script minimal, pas de dépendances                      -->
+<!-- -------------------------------------------------------------------- -->
+<script>
+  const toggle = document.querySelector('.nav-toggle') as HTMLButtonElement;
+  const menu   = document.getElementById('mobile-menu') as HTMLDivElement;
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = !menu.hidden;
+    menu.hidden = isOpen;
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    toggle.classList.toggle('is-open', !isOpen);
+  });
+
+  // Fermer le menu au clic sur un lien
+  menu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.classList.remove('is-open');
+    });
+  });
+</script>
+
+<style>
+  /* -------------------------------------------------------------------------
+   * Tokens de design
+   * ------------------------------------------------------------------------ */
+  :root {
+    --color-bg:         #FAF7F2;
+    --color-surface:    #FFFFFF;
+    --color-text:       #2A2520;
+    --color-text-muted: #7A6E65;
+    --color-accent:     #C4714A;
+    --color-accent-hover: #A85C38;
+    --color-border:     #E8E0D6;
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+
+    --nav-height: 4rem;
+    --max-width:  72rem;
+    --padding-x:  1.5rem;
+  }
+
+  /* -------------------------------------------------------------------------
+   * Reset minimal + base
+   * ------------------------------------------------------------------------ */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    background-color: var(--color-bg);
+    color:            var(--color-text);
+    font-family:      var(--font-body);
+    font-size:        1rem;
+    line-height:      1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* -------------------------------------------------------------------------
+   * Header & Navigation
+   * ------------------------------------------------------------------------ */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .site-nav {
+    max-width:    var(--max-width);
+    margin-inline: auto;
+    padding:      0 var(--padding-x);
+    height:       var(--nav-height);
+    display:      flex;
+    align-items:  center;
+    justify-content: space-between;
+  }
+
+  /* Marque */
+  .brand {
+    font-family:  var(--font-display);
+    font-size:    1.5rem;
+    font-weight:  600;
+    letter-spacing: 0.01em;
+    color:        var(--color-text);
+    transition:   color 0.2s;
+  }
+  .brand em {
+    font-style:  italic;
+    font-weight: 400;
+    color:       var(--color-accent);
+  }
+  .brand:hover { color: var(--color-accent); }
+
+  /* Liens desktop */
+  .nav-links {
+    list-style: none;
+    margin:     0;
+    padding:    0;
+    display:    flex;
+    gap:        2rem;
+  }
+
+  .nav-link {
+    font-size:      0.875rem;
+    font-weight:    500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color:          var(--color-text-muted);
+    transition:     color 0.2s;
+    position:       relative;
+  }
+  .nav-link::after {
+    content:    '';
+    position:   absolute;
+    bottom:     -2px;
+    left:       0;
+    width:      0;
+    height:     1px;
+    background: var(--color-accent);
+    transition: width 0.2s ease;
+  }
+  .nav-link:hover {
+    color: var(--color-text);
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  /* Bouton hamburger */
+  .nav-toggle {
+    display:        none;
+    flex-direction: column;
+    gap:            5px;
+    background:     none;
+    border:         none;
+    cursor:         pointer;
+    padding:        4px;
+  }
+  .nav-toggle span {
+    display:          block;
+    width:            22px;
+    height:           1.5px;
+    background-color: var(--color-text);
+    transition:       transform 0.25s ease, opacity 0.25s ease;
+    transform-origin: center;
+  }
+  .nav-toggle.is-open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .nav-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.is-open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* Menu mobile */
+  .mobile-menu {
+    border-top:       1px solid var(--color-border);
+    background-color: var(--color-bg);
+    padding:          1rem var(--padding-x);
+  }
+  .mobile-menu ul {
+    list-style: none;
+    margin:     0;
+    padding:    0;
+    display:    flex;
+    flex-direction: column;
+    gap:        0;
+  }
+  .mobile-menu a {
+    display:     block;
+    padding:     0.75rem 0;
+    font-size:   1rem;
+    font-weight: 500;
+    color:       var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    transition:  color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--color-accent); }
+  .mobile-menu li:last-child a { border-bottom: none; }
+
+  /* -------------------------------------------------------------------------
+   * Contenu principal
+   * ------------------------------------------------------------------------ */
+  #main-content {
+    flex:       1;
+    width:      100%;
+    max-width:  var(--max-width);
+    margin-inline: auto;
+    padding:    2rem var(--padding-x) 4rem;
+  }
+
+  /* -------------------------------------------------------------------------
+   * Footer
+   * ------------------------------------------------------------------------ */
+  .site-footer {
+    border-top:      1px solid var(--color-border);
+    background-color: var(--color-surface);
+    padding:         3rem var(--padding-x) 2rem;
+    text-align:      center;
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    gap:             0.5rem;
+  }
+
+  .footer-brand {
+    font-family:  var(--font-display);
+    font-size:    1.375rem;
+    font-weight:  600;
+    margin:       0;
+  }
+  .footer-brand em {
+    font-style:  italic;
+    font-weight: 400;
+    color:       var(--color-accent);
+  }
+
+  .footer-tagline {
+    font-size:  0.875rem;
+    color:      var(--color-text-muted);
+    margin:     0;
+  }
+
+  .footer-contact {
+    margin-top:     0.5rem;
+    font-size:      0.875rem;
+    font-weight:    500;
+    color:          var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition:     color 0.2s;
+  }
+  .footer-contact:hover { color: var(--color-accent-hover); }
+
+  .footer-copy {
+    margin-top: 1rem;
+    font-size:  0.75rem;
+    color:      var(--color-text-muted);
+    margin-bottom: 0;
+  }
+
+  /* -------------------------------------------------------------------------
+   * Responsive
+   * ------------------------------------------------------------------------ */
+  @media (max-width: 640px) {
+    .nav-links  { display: none; }
+    .nav-toggle { display: flex; }
+  }
+</style>

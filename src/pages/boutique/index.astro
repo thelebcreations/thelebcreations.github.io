@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import CatalogueFilters from '../../components/CatalogueFilters.astro';
+import { getCollection } from 'astro:content';
+
+const articles = await getCollection('article');
+// Tri par défaut : aucun ordre imposé (ordre TinaCMS = ordre des fichiers)
+---
+<Base titre="Boutique">
+  <h1>Boutique</h1>
+  <CatalogueFilters />
+  <div id="catalogue-grid" class="grid ...">
+    {articles.map(article => (
+      <ArticleCard
+        slug={article.id}
+        {...article.data}
+        data-categorie={article.data.categorie}
+        data-theme={article.data.theme}
+        data-statut={article.data.statut}
+        data-prix={article.data.prix}
+      />
+    ))}
+  </div>
+</Base>

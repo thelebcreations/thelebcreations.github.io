@@ -1,0 +1,154 @@
+---
+interface Props {
+  images: string[];
+  titre:  string;
+}
+
+const { images, titre } = Astro.props;
+---
+
+<div class="gallery">
+
+  <!-- Image principale -->
+  <div class="gallery-main">
+    <img
+      id="gallery-main-img"
+      src={images[0]}
+      alt={titre}
+      class="main-image"
+      loading="eager"
+      decoding="async"
+    />
+  </div>
+
+  <!-- Miniatures (uniquement si plusieurs images) -->
+  {images.length > 1 && (
+    <div class="gallery-thumbs" role="list" aria-label="Autres photos">
+      {images.map((src, i) => (
+        <button
+          class={`thumb-btn ${i === 0 ? 'is-active' : ''}`}
+          data-src={src}
+          data-index={i}
+          role="listitem"
+          aria-label={`Photo ${i + 1} de ${images.length}`}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          <img
+            src={src}
+            alt={`${titre} — photo ${i + 1}`}
+            class="thumb-image"
+            loading="lazy"
+            decoding="async"
+          />
+        </button>
+      ))}
+    </div>
+  )}
+
+</div>
+
+<script>
+  const mainImg  = document.getElementById('gallery-main-img') as HTMLImageElement;
+  const thumbBtns = document.querySelectorAll<HTMLButtonElement>('.thumb-btn');
+
+  thumbBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.src!;
+
+      // Transition douce sur l'image principale
+      mainImg.style.opacity = '0';
+      setTimeout(() => {
+        mainImg.src = src;
+        mainImg.style.opacity = '1';
+      }, 150);
+
+      // Mettre à jour l'état actif
+      thumbBtns.forEach(b => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-pressed', 'true');
+    });
+  });
+</script>
+
+<style>
+  .gallery {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.75rem;
+  }
+
+  /* Image principale */
+  .gallery-main {
+    aspect-ratio:  1 / 1;
+    border-radius: 0.75rem;
+    overflow:      hidden;
+    background:    var(--color-bg, #FAF7F2);
+    border:        1px solid var(--color-border, #E8E0D6);
+  }
+
+  .main-image {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    transition: opacity 0.15s ease;
+  }
+
+  /* Miniatures */
+  .gallery-thumbs {
+    display:   flex;
+    gap:       0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .thumb-btn {
+    width:         4.5rem;
+    height:        4.5rem;
+    padding:       0;
+    border:        2px solid var(--color-border, #E8E0D6);
+    border-radius: 0.5rem;
+    overflow:      hidden;
+    cursor:        pointer;
+    background:    var(--color-bg, #FAF7F2);
+    transition:    border-color 0.2s ease, opacity 0.2s ease;
+    flex-shrink:   0;
+  }
+
+  .thumb-btn:hover {
+    border-color: var(--color-accent, #C4714A);
+  }
+
+  .thumb-btn.is-active {
+    border-color: var(--color-accent, #C4714A);
+    border-width: 2px;
+  }
+
+  .thumb-btn:not(.is-active) {
+    opacity: 0.65;
+  }
+
+  .thumb-btn:not(.is-active):hover {
+    opacity: 1;
+  }
+
+  .thumb-image {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    display:    block;
+  }
+
+  /* Desktop — galerie en colonne à côté du contenu */
+  @media (min-width: 768px) {
+    .gallery-main {
+      aspect-ratio: 4 / 3;
+    }
+
+    .thumb-btn {
+      width:  5rem;
+      height: 5rem;
+    }
+  }
+</style>
