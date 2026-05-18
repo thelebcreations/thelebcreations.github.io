@@ -1,0 +1,329 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArticleGallery from '../../components/ArticleGallery.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('article');
+  return articles.map(article => ({
+    params: { slug: article.id },
+    props:  { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content }  = await render(article);
+
+const {
+  titre,
+  prix,
+  quantite,
+  categorie,
+  theme,
+  statut,
+  images,
+} = article.data;
+
+const labelCategorie = categorie.replace(/-/g, ' ');
+
+// CTA contextuel selon le statut
+// Tous les états mènent au formulaire de contact car les articles
+// peuvent être fabriqués sur demande.
+const cta = {
+  disponible: {
+    label: 'Commander',
+    hint:  'Nous vous répondrons dans les plus brefs délais.',
+    sujet: `Commande : ${titre}`,
+  },
+  reserve: {
+    label: 'Signaler votre intérêt',
+    hint:  'Cet article est réservé — il peut être fabriqué sur demande.',
+    sujet: `Intérêt pour : ${titre} (réservé)`,
+  },
+  vendu: {
+    label: 'Signaler votre intérêt',
+    hint:  'Cet article est vendu — il peut être fabriqué sur demande.',
+    sujet: `Intérêt pour : ${titre} (vendu)`,
+  },
+} satisfies Record<typeof statut, { label: string; hint: string; sujet: string }>;
+
+const { label: ctaLabel, hint: ctaHint, sujet: ctaSujet } = cta[statut];
+const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
+---
+
+<Base
+  titre={titre}
+  description={`${titre} — ${labelCategorie}, thème ${theme}. ${prix} €`}
+  image={images[0]}
+>
+
+  <!-- Fil d'Ariane -->
+  <nav class="breadcrumb" aria-label="Fil d'Ariane">
+    <a href="/">Accueil</a>
+    <span aria-hidden="true">›</span>
+    <a href="/boutique">Boutique</a>
+    <span aria-hidden="true">›</span>
+    <span aria-current="page">{titre}</span>
+  </nav>
+
+  <!-- Contenu principal -->
+  <div class="article-layout">
+
+    <!-- Colonne gauche : galerie -->
+    <div class="article-gallery-col">
+      <ArticleGallery images={images} titre={titre} />
+    </div>
+
+    <!-- Colonne droite : détails -->
+    <div class="article-details-col">
+
+      <!-- En-tête -->
+      <div class="article-header">
+        <div class="article-meta-top">
+          <span class="article-categorie">{labelCategorie}</span>
+          <StatusBadge statut={statut} />
+        </div>
+        <h1 class="article-titre">{titre}</h1>
+        <p class="article-prix">
+          {prix.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+        </p>
+      </div>
+
+      <!-- Informations -->
+      <dl class="article-info">
+        <div class="info-row">
+          <dt>Thème</dt>
+          <dd class="capitalize">{theme}</dd>
+        </div>
+        {statut === 'disponible' && (
+          <div class="info-row">
+            <dt>Disponible</dt>
+            <dd>{quantite} exemplaire{quantite > 1 ? 's' : ''}</dd>
+          </div>
+        )}
+        <div class="info-row">
+          <dt>Fabrication</dt>
+          <dd>Fait main</dd>
+        </div>
+      </dl>
+
+      <!-- Description -->
+      <div class="article-description">
+        <Content />
+      </div>
+
+      <!-- CTA — actif pour tous les statuts -->
+      <div class="article-cta">
+        <a href={contactUrl} class={`btn-cta btn-${statut}`}>
+          {ctaLabel}
+        </a>
+        <p class="cta-hint">{ctaHint}</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Retour boutique -->
+  <div class="back-link-wrapper">
+    <a href="/boutique" class="back-link">← Retour à la boutique</a>
+  </div>
+
+</Base>
+
+<style>
+  /* Fil d'Ariane */
+  .breadcrumb {
+    display:     flex;
+    align-items: center;
+    gap:         0.5rem;
+    font-size:   0.8125rem;
+    color:       var(--color-text-muted, #7A6E65);
+    margin-bottom: 2rem;
+    flex-wrap:   wrap;
+  }
+
+  .breadcrumb a {
+    color:           var(--color-text-muted, #7A6E65);
+    text-decoration: none;
+    transition:      color 0.2s;
+  }
+  .breadcrumb a:hover        { color: var(--color-accent, #C4714A); }
+  .breadcrumb [aria-current] { color: var(--color-text, #2A2520); }
+
+  /* Layout deux colonnes */
+  .article-layout {
+    display:     grid;
+    gap:         3rem;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .article-layout { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .article-layout { grid-template-columns: 55% 1fr; }
+  }
+
+  /* Colonne détails */
+  .article-details-col {
+    display:        flex;
+    flex-direction: column;
+    gap:            1.5rem;
+  }
+
+  /* En-tête */
+  .article-header {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.5rem;
+  }
+
+  .article-meta-top {
+    display:     flex;
+    align-items: center;
+    gap:         0.75rem;
+    flex-wrap:   wrap;
+  }
+
+  .article-categorie {
+    font-size:      0.7rem;
+    font-weight:    500;
+    letter-spacing: 0.06em;
+    text-transform: capitalize;
+    color:          var(--color-text-muted, #7A6E65);
+  }
+
+  .article-titre {
+    font-family: var(--font-display, serif);
+    font-size:   clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    line-height: 1.25;
+    margin:      0;
+    color:       var(--color-text, #2A2520);
+  }
+
+  .article-prix {
+    font-size:   1.5rem;
+    font-weight: 600;
+    color:       var(--color-accent, #C4714A);
+    margin:      0;
+  }
+
+  /* Informations */
+  .article-info {
+    display:        flex;
+    flex-direction: column;
+    margin:         0;
+    border:         1px solid var(--color-border, #E8E0D6);
+    border-radius:  0.5rem;
+    overflow:       hidden;
+  }
+
+  .info-row {
+    display:       flex;
+    padding:       0.6rem 1rem;
+    font-size:     0.875rem;
+    border-bottom: 1px solid var(--color-border, #E8E0D6);
+  }
+  .info-row:last-child { border-bottom: none; }
+
+  .info-row dt {
+    width:       8rem;
+    flex-shrink: 0;
+    color:       var(--color-text-muted, #7A6E65);
+  }
+
+  .info-row dd {
+    margin:      0;
+    color:       var(--color-text, #2A2520);
+    font-weight: 500;
+  }
+
+  .capitalize { text-transform: capitalize; }
+
+  /* Description */
+  .article-description {
+    font-size:   0.9375rem;
+    line-height: 1.7;
+    color:       var(--color-text, #2A2520);
+  }
+  .article-description :global(p)           { margin: 0 0 0.75em; }
+  .article-description :global(p:last-child){ margin-bottom: 0; }
+  .article-description :global(ul),
+  .article-description :global(ol)          { padding-left: 1.25em; }
+
+  /* CTA */
+  .article-cta {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.625rem;
+  }
+
+  .btn-cta {
+    display:         block;
+    width:           100%;
+    padding:         0.875rem 1.5rem;
+    border-radius:   0.5rem;
+    font-size:       1rem;
+    font-family:     var(--font-body, sans-serif);
+    font-weight:     500;
+    text-align:      center;
+    text-decoration: none;
+    transition:      background 0.2s, transform 0.1s;
+  }
+
+  /* Disponible — plein terracotta */
+  .btn-disponible {
+    background: var(--color-accent, #C4714A);
+    color:      #fff;
+  }
+  .btn-disponible:hover  { background: var(--color-accent-hover, #A85C38); }
+  .btn-disponible:active { transform: translateY(1px); }
+
+  /* Réservé — contour terracotta */
+  .btn-reserve {
+    background:  transparent;
+    color:       var(--color-accent, #C4714A);
+    border:      1.5px solid var(--color-accent, #C4714A);
+  }
+  .btn-reserve:hover {
+    background: var(--color-accent, #C4714A);
+    color:      #fff;
+  }
+
+  /* Vendu — contour neutre */
+  .btn-vendu {
+    background:  transparent;
+    color:       var(--color-text-muted, #7A6E65);
+    border:      1.5px solid var(--color-border, #E8E0D6);
+  }
+  .btn-vendu:hover {
+    border-color: var(--color-text-muted, #7A6E65);
+    color:        var(--color-text, #2A2520);
+  }
+
+  .cta-hint {
+    font-size:  0.8125rem;
+    color:      var(--color-text-muted, #7A6E65);
+    margin:     0;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Retour boutique */
+  .back-link-wrapper {
+    margin-top:  3rem;
+    padding-top: 1.5rem;
+    border-top:  1px solid var(--color-border, #E8E0D6);
+  }
+
+  .back-link {
+    font-size:   0.875rem;
+    font-weight: 500;
+    color:       var(--color-text-muted, #7A6E65);
+    transition:  color 0.2s;
+  }
+  .back-link:hover { color: var(--color-accent, #C4714A); }
+</style>

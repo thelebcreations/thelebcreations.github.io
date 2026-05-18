@@ -1,36 +1,247 @@
 ---
 import Base from '../layouts/Base.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import { getEntry, getEntries } from 'astro:content';
+import { getEntry, getCollection } from 'astro:content';
 
 // Charger le singleton accueil
 const accueil = await getEntry('accueil', 'accueil');
-const refs = accueil.data.articlesVedette ?? [];
+const refs    = accueil?.data.articlesVedette ?? [];
 
-// Résoudre les slugs en entrées complètes
-const articlesVedette = await Promise.all(
-  refs.map(({ article }) => getEntry('article', article))
-).then(entries => entries.filter(Boolean));
+// Résoudre les slugs en entrées complètes, ignorer les refs cassées
+const tous = await getCollection('article');
+const articlesVedette = refs
+  .map(({ article: slug }) => tous.find(a => a.id === slug))
+  .filter((a): a is NonNullable<typeof a> => a !== undefined);
 ---
-<Base titre="Accueil">
-  <!-- Hero section -->
-  <section>
-    <h1>TheLeb Créations</h1>
-    <p>Créations faites main avec amour.</p>
-    <a href="/boutique" class="btn btn-primary">Voir la boutique</a>
+
+<Base
+  titre="TheLeb Créations"
+  description="Créations faites main avec amour — bavoirs, lingettes, accessoires et plus."
+>
+
+  <!-- -------------------------------------------------------------------- -->
+  <!-- Hero                                                                  -->
+  <!-- -------------------------------------------------------------------- -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Fait main avec amour</p>
+      <h1 class="hero-title">
+        Des créations uniques<br />
+        <em>pour les petits et les grands</em>
+      </h1>
+      <p class="hero-description">
+        Chaque pièce est cousue à la main, dans des tissus soigneusement
+        choisis. Bavoirs, lingettes, sacs, accessoires — découvrez notre
+        collection.
+      </p>
+      <a href="/boutique" class="btn-primary">Voir la boutique</a>
+    </div>
   </section>
 
-  <!-- Articles en vedette -->
-  <section>
-    <h2>Nos créations</h2>
-    <div class="grid ...">
-      {articlesVedette.map(article => (
-        <ArticleCard
-          slug={article.id}
-          {...article.data}
-        />
-      ))}
+  <!-- -------------------------------------------------------------------- -->
+  <!-- Articles en vedette                                                   -->
+  <!-- -------------------------------------------------------------------- -->
+  {articlesVedette.length > 0 && (
+    <section class="featured-section">
+      <div class="section-header">
+        <h2 class="section-title">Nos créations</h2>
+        <a href="/boutique" class="section-link">Voir tout le catalogue →</a>
+      </div>
+
+      <div class="articles-grid">
+        {articlesVedette.map(article => (
+          <ArticleCard
+            slug={article.id}
+            titre={article.data.titre}
+            prix={article.data.prix}
+            statut={article.data.statut}
+            images={article.data.images}
+            categorie={article.data.categorie}
+            theme={article.data.theme}
+            quantite={article.data.quantite}
+          />
+        ))}
+      </div>
+
+      <div class="featured-cta">
+        <a href="/boutique" class="btn-secondary">Voir tout le catalogue</a>
+      </div>
+    </section>
+  )}
+
+  <!-- -------------------------------------------------------------------- -->
+  <!-- Bandeau "À propos" rapide                                             -->
+  <!-- -------------------------------------------------------------------- -->
+  <section class="about-strip">
+    <div class="about-strip-content">
+      <p class="about-strip-text">
+        Toutes nos créations sont <strong>faites main</strong>, en petite série
+        ou en pièce unique. Vous ne trouvez pas ce que vous cherchez ?
+      </p>
+      <a href="/contact" class="btn-primary">Contactez-nous</a>
     </div>
-    <a href="/boutique">Voir tout le catalogue →</a>
   </section>
+
 </Base>
+
+<style>
+  /* ------------------------------------------------------------------ */
+  /* Hero                                                                 */
+  /* ------------------------------------------------------------------ */
+  .hero {
+    padding:    4rem 0 3rem;
+    text-align: center;
+    max-width:  42rem;
+    margin:     0 auto;
+  }
+
+  .hero-eyebrow {
+    font-size:      0.75rem;
+    font-weight:    500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color:          var(--color-accent, #C4714A);
+    margin:         0 0 1rem;
+  }
+
+  .hero-title {
+    font-family:  var(--font-display, serif);
+    font-size:    clamp(2rem, 5vw, 3rem);
+    font-weight:  600;
+    line-height:  1.2;
+    margin:       0 0 1.25rem;
+    color:        var(--color-text, #2A2520);
+  }
+
+  .hero-title em {
+    font-style:  italic;
+    font-weight: 400;
+    color:       var(--color-accent, #C4714A);
+  }
+
+  .hero-description {
+    font-size:   1.0625rem;
+    color:       var(--color-text-muted, #7A6E65);
+    line-height: 1.7;
+    margin:      0 0 2rem;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Articles en vedette                                                  */
+  /* ------------------------------------------------------------------ */
+  .featured-section {
+    padding: 2rem 0 3rem;
+  }
+
+  .section-header {
+    display:        flex;
+    align-items:    baseline;
+    justify-content: space-between;
+    gap:            1rem;
+    margin-bottom:  1.5rem;
+    flex-wrap:      wrap;
+  }
+
+  .section-title {
+    font-family:  var(--font-display, serif);
+    font-size:    1.75rem;
+    font-weight:  600;
+    margin:       0;
+    color:        var(--color-text, #2A2520);
+  }
+
+  .section-link {
+    font-size:   0.875rem;
+    font-weight: 500;
+    color:       var(--color-accent, #C4714A);
+    transition:  color 0.2s;
+    white-space: nowrap;
+  }
+  .section-link:hover { color: var(--color-accent-hover, #A85C38); }
+
+  .articles-grid {
+    display:               grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap:                   1.25rem;
+  }
+
+  .featured-cta {
+    text-align: center;
+    margin-top: 2.5rem;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Bandeau à propos                                                     */
+  /* ------------------------------------------------------------------ */
+  .about-strip {
+    background:    var(--color-surface, #fff);
+    border:        1px solid var(--color-border, #E8E0D6);
+    border-radius: 0.75rem;
+    padding:       2rem 1.5rem;
+    margin-top:    1rem;
+  }
+
+  .about-strip-content {
+    display:        flex;
+    align-items:    center;
+    justify-content: space-between;
+    gap:            1.5rem;
+    flex-wrap:      wrap;
+  }
+
+  .about-strip-text {
+    font-size:  1rem;
+    color:      var(--color-text-muted, #7A6E65);
+    margin:     0;
+    flex:       1;
+    min-width:  16rem;
+    line-height: 1.6;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Boutons                                                              */
+  /* ------------------------------------------------------------------ */
+  .btn-primary {
+    display:         inline-block;
+    background:      var(--color-accent, #C4714A);
+    color:           #fff;
+    padding:         0.7rem 1.75rem;
+    border-radius:   0.5rem;
+    font-size:       0.9375rem;
+    font-weight:     500;
+    text-decoration: none;
+    transition:      background 0.2s, transform 0.1s;
+    white-space:     nowrap;
+  }
+  .btn-primary:hover  { background: var(--color-accent-hover, #A85C38); }
+  .btn-primary:active { transform: translateY(1px); }
+
+  .btn-secondary {
+    display:         inline-block;
+    background:      transparent;
+    color:           var(--color-accent, #C4714A);
+    padding:         0.65rem 1.75rem;
+    border-radius:   0.5rem;
+    border:          1.5px solid var(--color-accent, #C4714A);
+    font-size:       0.9375rem;
+    font-weight:     500;
+    text-decoration: none;
+    transition:      background 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover {
+    background: var(--color-accent, #C4714A);
+    color:      #fff;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Responsive                                                           */
+  /* ------------------------------------------------------------------ */
+  @media (max-width: 640px) {
+    .hero { padding: 2.5rem 0 2rem; }
+
+    .about-strip-content {
+      flex-direction: column;
+      text-align:     center;
+    }
+  }
+</style>
