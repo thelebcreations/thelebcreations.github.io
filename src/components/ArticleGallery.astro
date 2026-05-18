@@ -85,8 +85,8 @@ const { images, titre } = Astro.props;
     aspect-ratio:  1 / 1;
     border-radius: 0.75rem;
     overflow:      hidden;
-    background:    var(--color-bg, #FAF7F2);
-    border:        1px solid var(--color-border, #E8E0D6);
+    background:    var(--color-bg, #FDFBF7);
+    border:        1px solid var(--color-border, #E2DDD5);
   }
 
   .main-image {
@@ -107,21 +107,21 @@ const { images, titre } = Astro.props;
     width:         4.5rem;
     height:        4.5rem;
     padding:       0;
-    border:        2px solid var(--color-border, #E8E0D6);
+    border:        2px solid var(--color-border, #E2DDD5);
     border-radius: 0.5rem;
     overflow:      hidden;
     cursor:        pointer;
-    background:    var(--color-bg, #FAF7F2);
+    background:    var(--color-bg, #FDFBF7);
     transition:    border-color 0.2s ease, opacity 0.2s ease;
     flex-shrink:   0;
   }
 
   .thumb-btn:hover {
-    border-color: var(--color-accent, #C4714A);
+    border-color: var(--color-accent, #E6997C);
   }
 
   .thumb-btn.is-active {
-    border-color: var(--color-accent, #C4714A);
+    border-color: var(--color-accent, #E6997C);
     border-width: 2px;
   }
 

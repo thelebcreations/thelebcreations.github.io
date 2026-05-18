@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+/* 
+  Configuration du thème Tailwind avec notre nouvelle palette
+  Pour utiliser les classes utilitaires (ex: bg-bg, text-accent)
+*/
+@theme {
+  --color-bg: #FDFBF7;
+  --color-surface: #FFFFFF;
+  --color-text: #2B2D42;
+  --color-text-muted: #6B6D80;
+  --color-accent: #E6997C;
+  --color-accent-hover: #D88463;
+  --color-secondary: #739371;
+  --color-secondary-hover: #8AB472;
+  --color-highlight: #FFB703;
+  --color-border: #E2DDD5;
+}
+
+/* Configuration de DaisyUI avec une déclinaison de notre palette */
 @plugin "daisyui" {
-    themes: light --default;
+  themes: custom --default;
+}
+
+/* Thème personnalisé pour DaisyUI (format oklch/hsl géré par DaisyUI) */
+[data-theme="custom"] {
+  color-scheme: light;
+  
+  /* Primary = Terracotta-Peach (#E6997C) */
+  --p: 67% 0.12 45; 
+  /* Secondary = Dusty Olive (#739371) */
+  --s: 60% 0.05 135; 
+  /* Accent = Mustard Gold (#FFB703) */
+  --a: 78% 0.18 80;
+  
+  /* Neutral = Charcoal Slate (#2B2D42) */
+  --n: 25% 0.03 260; 
+  --nc: 85% 0.01 260;
+  
+  /* Base 100 = Oatmeal White (#FDFBF7) */
+  --b1: 98% 0.01 80; 
+  --b2: 95% 0.01 80; 
+  --b3: 92% 0.01 80; 
+  --bc: 25% 0.03 260;
 }

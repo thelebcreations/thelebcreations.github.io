@@ -35,11 +35,11 @@ import Base from '../layouts/Base.astro';
 
   .not-found-code {
     font-family:  var(--font-display, serif);
-    font-size:    6rem;
-    font-weight:  600;
+    font-size:    8rem;
+    font-weight:  700;
     line-height:  1;
-    color:        var(--color-border, #E8E0D6);
-    margin:       0 0 0.5rem;
+    color:        var(--color-border, #E2DDD5);
+    margin:       0 0 1rem;
   }
 
   .not-found-title {
@@ -47,12 +47,12 @@ import Base from '../layouts/Base.astro';
     font-size:    clamp(1.5rem, 3vw, 2rem);
     font-weight:  600;
     margin:       0 0 1rem;
-    color:        var(--color-text, #2A2520);
+    color:        var(--color-text, #2B2D42);
   }
 
-  .not-found-text {
-    font-size:   1rem;
-    color:       var(--color-text-muted, #7A6E65);
+  .error-text {
+    font-size:   1.0625rem;
+    color:       var(--color-text-muted, #6B6D80);
     line-height: 1.6;
     margin:      0 0 2rem;
   }
@@ -66,16 +66,16 @@ import Base from '../layouts/Base.astro';
 
   .btn-primary {
     display:         inline-block;
-    background:      var(--color-accent, #C4714A);
+    background:      var(--color-accent, #E6997C);
     color:           #fff;
-    padding:         0.7rem 1.75rem;
+    padding:         0.75rem 2rem;
     border-radius:   0.5rem;
     font-size:       0.9375rem;
     font-weight:     500;
     text-decoration: none;
     transition:      background 0.2s;
   }
-  .btn-primary:hover { background: var(--color-accent-hover, #A85C38); }
+  .btn-primary:hover { background: var(--color-accent-hover, #D88463); }
 
   .btn-secondary {
     display:         inline-block;

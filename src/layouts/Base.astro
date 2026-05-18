@@ -141,13 +141,16 @@ const nav = [
    * Tokens de design
    * ------------------------------------------------------------------------ */
   :root {
-    --color-bg:         #FAF7F2;
-    --color-surface:    #FFFFFF;
-    --color-text:       #2A2520;
-    --color-text-muted: #7A6E65;
-    --color-accent:     #C4714A;
-    --color-accent-hover: #A85C38;
-    --color-border:     #E8E0D6;
+    --color-bg:             #FDFBF7;
+    --color-surface:        #FFFFFF;
+    --color-text:           #2B2D42;
+    --color-text-muted:     #6B6D80;
+    --color-accent:         #E6997C;
+    --color-accent-hover:   #D88463;
+    --color-secondary:      #739371;
+    --color-secondary-hover:#8AB472;
+    --color-highlight:      #FFB703;
+    --color-border:         #E2DDD5;
 
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body:    'DM Sans', system-ui, sans-serif;
@@ -166,7 +169,7 @@ const nav = [
     background-color: var(--color-bg);
     color:            var(--color-text);
     font-family:      var(--font-body);
-    font-size:        1rem;
+    font-size:        1.0625rem;
     line-height:      1.6;
     -webkit-font-smoothing: antialiased;
   }
@@ -192,6 +195,13 @@ const nav = [
     border-bottom: 1px solid var(--color-border);
   }
 
+  .site-header::before {
+    content:    '';
+    display:    block;
+    height:     4px;
+    background: var(--color-secondary);
+  }
+
   .site-nav {
     max-width:    var(--max-width);
     margin-inline: auto;
@@ -214,7 +224,7 @@ const nav = [
   .brand em {
     font-style:  italic;
     font-weight: 400;
-    color:       var(--color-accent);
+    color:       var(--color-secondary);
   }
   .brand:hover { color: var(--color-accent); }
 
@@ -333,7 +343,7 @@ const nav = [
   .footer-brand em {
     font-style:  italic;
     font-weight: 400;
-    color:       var(--color-accent);
+    color:       var(--color-secondary);
   }
 
   .footer-tagline {

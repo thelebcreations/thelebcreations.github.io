@@ -138,18 +138,18 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     align-items: center;
     gap:         0.5rem;
     font-size:   0.8125rem;
-    color:       var(--color-text-muted, #7A6E65);
+    color:       var(--color-text-muted, #6B6D80);
     margin-bottom: 2rem;
     flex-wrap:   wrap;
   }
 
   .breadcrumb a {
-    color:           var(--color-text-muted, #7A6E65);
+    color:           var(--color-text-muted, #6B6D80);
     text-decoration: none;
     transition:      color 0.2s;
   }
-  .breadcrumb a:hover        { color: var(--color-accent, #C4714A); }
-  .breadcrumb [aria-current] { color: var(--color-text, #2A2520); }
+  .breadcrumb a:hover        { color: var(--color-accent, #E6997C); }
+  .breadcrumb [aria-current] { color: var(--color-text, #2B2D42); }
 
   /* Layout deux colonnes */
   .article-layout {
@@ -192,7 +192,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     font-weight:    500;
     letter-spacing: 0.06em;
     text-transform: capitalize;
-    color:          var(--color-text-muted, #7A6E65);
+    color:          var(--color-text-muted, #6B6D80);
   }
 
   .article-titre {
@@ -201,13 +201,13 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     font-weight: 600;
     line-height: 1.25;
     margin:      0;
-    color:       var(--color-text, #2A2520);
+    color:       var(--color-text, #2B2D42);
   }
 
   .article-prix {
     font-size:   1.5rem;
     font-weight: 600;
-    color:       var(--color-accent, #C4714A);
+    color:       var(--color-accent, #E6997C);
     margin:      0;
   }
 
@@ -216,7 +216,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     display:        flex;
     flex-direction: column;
     margin:         0;
-    border:         1px solid var(--color-border, #E8E0D6);
+    border:         1px solid var(--color-border, #E2DDD5);
     border-radius:  0.5rem;
     overflow:       hidden;
   }
@@ -225,19 +225,19 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     display:       flex;
     padding:       0.6rem 1rem;
     font-size:     0.875rem;
-    border-bottom: 1px solid var(--color-border, #E8E0D6);
+    border-bottom: 1px solid var(--color-border, #E2DDD5);
   }
   .info-row:last-child { border-bottom: none; }
 
   .info-row dt {
     width:       8rem;
     flex-shrink: 0;
-    color:       var(--color-text-muted, #7A6E65);
+    color:       var(--color-text-muted, #6B6D80);
   }
 
   .info-row dd {
     margin:      0;
-    color:       var(--color-text, #2A2520);
+    color:       var(--color-text, #2B2D42);
     font-weight: 500;
   }
 
@@ -247,7 +247,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
   .article-description {
     font-size:   0.9375rem;
     line-height: 1.7;
-    color:       var(--color-text, #2A2520);
+    color:       var(--color-text, #2B2D42);
   }
   .article-description :global(p)           { margin: 0 0 0.75em; }
   .article-description :global(p:last-child){ margin-bottom: 0; }
@@ -276,37 +276,37 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
 
   /* Disponible — plein terracotta */
   .btn-disponible {
-    background: var(--color-accent, #C4714A);
+    background: var(--color-accent, #E6997C);
     color:      #fff;
   }
-  .btn-disponible:hover  { background: var(--color-accent-hover, #A85C38); }
+  .btn-disponible:hover  { background: var(--color-accent-hover, #D88463); }
   .btn-disponible:active { transform: translateY(1px); }
 
   /* Réservé — contour terracotta */
   .btn-reserve {
     background:  transparent;
-    color:       var(--color-accent, #C4714A);
-    border:      1.5px solid var(--color-accent, #C4714A);
+    color:       var(--color-accent, #E6997C);
+    border:      1.5px solid var(--color-accent, #E6997C);
   }
   .btn-reserve:hover {
-    background: var(--color-accent, #C4714A);
+    background: var(--color-accent, #E6997C);
     color:      #fff;
   }
 
   /* Vendu — contour neutre */
   .btn-vendu {
     background:  transparent;
-    color:       var(--color-text-muted, #7A6E65);
-    border:      1.5px solid var(--color-border, #E8E0D6);
+    color:       var(--color-text-muted, #6B6D80);
+    border:      1.5px solid var(--color-border, #E2DDD5);
   }
   .btn-vendu:hover {
-    border-color: var(--color-text-muted, #7A6E65);
-    color:        var(--color-text, #2A2520);
+    border-color: var(--color-text-muted, #6B6D80);
+    color:        var(--color-text, #2B2D42);
   }
 
   .cta-hint {
     font-size:  0.8125rem;
-    color:      var(--color-text-muted, #7A6E65);
+    color:      var(--color-text-muted, #6B6D80);
     margin:     0;
     text-align: center;
     line-height: 1.5;
@@ -316,14 +316,14 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
   .back-link-wrapper {
     margin-top:  3rem;
     padding-top: 1.5rem;
-    border-top:  1px solid var(--color-border, #E8E0D6);
+    border-top:  1px solid var(--color-border, #E2DDD5);
   }
 
   .back-link {
     font-size:   0.875rem;
     font-weight: 500;
-    color:       var(--color-text-muted, #7A6E65);
+    color:       var(--color-text-muted, #6B6D80);
     transition:  color 0.2s;
   }
-  .back-link:hover { color: var(--color-accent, #C4714A); }
+  .back-link:hover { color: var(--color-accent, #E6997C); }
 </style>

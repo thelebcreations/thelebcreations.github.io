@@ -60,7 +60,7 @@ const image  = images[0];
 <style>
   .article-card {
     background:    var(--color-surface, #fff);
-    border:        1px solid var(--color-border, #E8E0D6);
+    border:        1px solid var(--color-border, #E2DDD5);
     border-radius: 0.75rem;
     overflow:      hidden;
     transition:    transform 0.2s ease, box-shadow 0.2s ease;
@@ -68,7 +68,7 @@ const image  = images[0];
 
   .article-card:not(.is-sold):hover {
     transform:  translateY(-3px);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text, #2A2520) 8%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-text, #2B2D42) 8%, transparent);
   }
 
   .article-card.is-sold {
@@ -87,7 +87,7 @@ const image  = images[0];
     position:       relative;
     aspect-ratio:   4 / 3;
     overflow:       hidden;
-    background:     var(--color-bg, #FAF7F2);
+    background:     var(--color-bg, #FDFBF7);
   }
 
   .card-image {
@@ -107,11 +107,11 @@ const image  = images[0];
     display:         flex;
     align-items:     center;
     justify-content: center;
-    background:      color-mix(in srgb, #FAF7F2 60%, transparent);
+    background:      color-mix(in srgb, #FDFBF7 60%, transparent);
     font-family:     var(--font-display, serif);
     font-size:       1.25rem;
     font-style:      italic;
-    color:           var(--color-text-muted, #7A6E65);
+    color:           var(--color-text-muted, #6B6D80);
     letter-spacing:  0.05em;
   }
 
@@ -148,12 +148,12 @@ const image  = images[0];
   .card-prix {
     font-size:   1.0625rem;
     font-weight: 500;
-    color:       var(--color-accent, #C4714A);
+    color:       var(--color-text, #2B2D42);
   }
 
   .card-quantite {
     font-size: 0.75rem;
-    color:     var(--color-text-muted, #7A6E65);
+    color:     var(--color-text-muted, #6B6D80);
   }
 
   .card-tags {
@@ -167,9 +167,9 @@ const image  = images[0];
     font-size:        0.6875rem;
     letter-spacing:   0.04em;
     text-transform:   capitalize;
-    color:            var(--color-text-muted, #7A6E65);
-    background:       var(--color-bg, #FAF7F2);
-    border:           1px solid var(--color-border, #E8E0D6);
+    color:            var(--color-text-muted, #6B6D80);
+    background:       var(--color-bg, #FDFBF7);
+    border:           1px solid var(--color-border, #E2DDD5);
     border-radius:    999px;
     padding:          0.15em 0.6em;
   }
