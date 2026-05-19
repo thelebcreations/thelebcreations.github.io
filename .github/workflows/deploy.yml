@@ -27,6 +27,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          NODE_OPTIONS:                 "--max-old-space-size=6144"
           TINA_CLIENT_ID:               ${{ secrets.TINA_CLIENT_ID }}
           TINA_TOKEN:                   ${{ secrets.TINA_TOKEN }}
           PUBLIC_EMAILJS_SERVICE_ID:    ${{ secrets.PUBLIC_EMAILJS_SERVICE_ID }}
