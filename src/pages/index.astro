@@ -7,11 +7,19 @@ import { getEntry, getCollection } from 'astro:content';
 const accueil = await getEntry('accueil', 'accueil');
 const refs    = accueil?.data.articlesVedette ?? [];
 
-// Résoudre les slugs en entrées complètes, ignorer les refs cassées
+// Résoudre les slugs en entrées complètes, ignorer les refs cassées.
+// Puis compléter automatiquement avec les articles marqués vedette: true.
 const tous = await getCollection('article');
-const articlesVedette = refs
+const depuisAccueil = refs
   .map(({ article: slug }) => tous.find(a => a.id === slug))
   .filter((a): a is NonNullable<typeof a> => a !== undefined);
+
+const dejaSelectionnes = new Set(depuisAccueil.map((a) => a.id));
+const automatiques = tous.filter(
+  (a) => a.data.vedette && !dejaSelectionnes.has(a.id)
+);
+
+const articlesVedette = [...depuisAccueil, ...automatiques];
 ---
 
 <Base
