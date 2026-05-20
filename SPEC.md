@@ -1,6 +1,6 @@
 # SPEC.md — Boutique Créations Faites Main
 
-> Version 1.0 — Static shop website built with Astro, hosted on GitHub Pages.
+> Version 1.1 — Spécification alignée sur l'implémentation actuelle (Astro + TinaCMS + GitHub Pages).
 
 ---
 
@@ -9,7 +9,7 @@
 | Contrainte | Détail |
 |---|---|
 | Coût | Zéro — setup et opération |
-| Hébergement | GitHub Pages (URL par défaut `username.github.io/repo`) |
+| Hébergement | GitHub Pages (site servi à la racine `https://thelebcreations.github.io`) |
 | Rendu | 100% statique — zéro SSR |
 | Éditeurs | 2 éditeurs non-techniques, francophones |
 | Langue | Français uniquement |
@@ -18,86 +18,91 @@
 
 ## 2. Stack Technique
 
-| Couche | Outil | Justification |
+| Couche | Outil | Notes d'implémentation |
 |---|---|---|
-| Framework | [Astro](https://astro.build) (latest stable) | Static-first, excellent DX, génération de pages statiques |
-| Language | TypeScript (strict) | Types auto-générés par TinaCMS, erreurs détectées au build |
-| Styling | Tailwind CSS + DaisyUI | Zéro runtime CSS, composants prêts (cards, badges, filtres) |
-| CMS | TinaCMS + Tina Cloud (free tier) | UI éditoriale pour non-techniciens, commits directs sur `main` |
-| Formulaire | EmailJS (free tier — 200 emails/mois) | Client-side only, pré-remplissage depuis les pages articles |
-| Images | Repo-based (`/public/uploads/`) | Zéro dépendance externe, optimisation via `<Image>` Astro |
-| CI/CD | GitHub Actions → GitHub Pages | Déclenchement automatique sur push `main` |
+| Framework | [Astro](https://astro.build) | Build statique (`output: 'static'`) |
+| Language | TypeScript (strict) | `astro/tsconfigs/strict` + validation de contenu Astro |
+| Styling | Tailwind CSS v4 + DaisyUI + CSS custom | Tailwind injecté via plugin Vite `@tailwindcss/vite` |
+| CMS | TinaCMS + Tina Cloud | Schéma dans `tina/config.ts`, build via CLI Tina |
+| Formulaire | EmailJS (`@emailjs/browser`) | Client-side only, envoi via `emailjs.sendForm(...)` |
+| Images | Repo-based (`/public/uploads/`) | Rendu actuel via `<img>` (lazy/eager), pas via `<Image>` Astro |
+| CI/CD | GitHub Actions → GitHub Pages | Déploiement sur `gh-pages` à chaque push `main` |
 | Analytics | Aucune | Zéro dépendance, zéro cookie banner |
 
 ---
 
 ## 3. Modèle de Contenu
 
-### 3.1 Collection — `articles`
+### 3.1 Collection articles
 
-Chaque article est un fichier géré par TinaCMS. Les slugs sont auto-générés depuis `titre`.
+Notes de nommage :
+- Dossier de contenu : `content/articles/`
+- Nom de collection TinaCMS : `article` (singulier)
+- Nom de collection Astro Content : `article` (singulier)
 
-| Champ | Type | Requis | Notes |
+Chaque article est un fichier Markdown géré par TinaCMS. Le slug (nom de fichier) est auto-généré depuis `titre`.
+
+| Clé de donnée | Type | Requis | Notes |
 |---|---|---|---|
 | `titre` | `string` | ✅ | Nom de l'article |
-| `description` | `rich-text` | ✅ | Description libre |
-| `prix` | `number` | ✅ | En euros, ex: `5.00` |
-| `catégorie` | `enum` | ✅ | Voir valeurs §3.3 |
-| `thème` | `enum` | ✅ | Voir valeurs §3.4 |
-| `statut` | `enum` | ✅ | `disponible` / `réservé` / `vendu` |
-| `quantité` | `number` | ✅ | Entier ≥ 1 |
-| `images` | `image[]` | ✅ | 1 à 6 images, stockées dans `/public/uploads/` |
-| `vedette` | `boolean` | ✅ | Défaut `false` — contrôle l'apparition en page d'accueil |
+| `description` | `rich-text` (body markdown) | ✅ éditorialement | Stocké dans le corps markdown |
+| `prix` | `number` | ✅ | En euros |
+| `categorie` | `enum` | ✅ | Voir valeurs §3.3 |
+| `theme` | `enum` | ✅ | Voir valeurs §3.4 |
+| `statut` | `enum` | ✅ | `disponible` / `reserve` / `vendu` |
+| `quantite` | `number` | ✅ | Entier ≥ 1 |
+| `images` | `image[]` | ✅ | 1 à 6 images dans `/public/uploads/` |
+| `vedette` | `boolean` | ✅ | Défaut `false` |
 
 ### 3.2 Singletons
 
 | Singleton | Champs |
 |---|---|
-| `accueil` | Liste ordonnée de références vers des `articles` (sélection éditoriale) |
-| `a-propos` | `texte` (rich-text), `photo` (image), `nom` (string) |
+| `accueil` | `articlesVedette[]` (liste ordonnée de références vers des `article`) |
+| `a-propos` | `nom` (string), `photo` (image), `texte` (rich-text body) |
 
-### 3.3 Valeurs — `catégorie`
-
-```
-Accessoires téléphone
-Hygiène et soin
-Porte-clés
-Sacs
-Essuie-mains
-Bavoirs
-Porte-monnaies
-Décorations
-Socquettes
-Doudous
-Autre
-```
-
-### 3.4 Valeurs — `thème`
+### 3.3 Valeurs `categorie` (clés stockées)
 
 ```
-Ludique
-Breton
-Nature
-Animaux
-Mer
-Poissons
-Noël
-Dinosaures
-Bonhommes
-Santé
-Musique
-Voyage
-Abstrait
-Carreaux
-Pois
-Autre
+accessoires-telephone
+hygiene-et-soin
+porte-cles
+sacs
+essuie-mains
+bavoirs
+porte-monnaies
+decorations
+socquettes
+doudous
+autre
+```
+
+### 3.4 Valeurs `theme` (clés stockées)
+
+```
+ludique
+breton
+nature
+animaux
+mer
+poissons
+noel
+dinosaures
+bonhommes
+sante
+musique
+voyage
+abstrait
+carreaux
+pois
+autre
 ```
 
 ---
 
 ## 4. Pages
 
-### 4.1 Vue d'ensemble du routing
+### 4.1 Routing
 
 ```
 /                       → Accueil
@@ -110,69 +115,72 @@ Autre
 
 ### 4.2 `/` — Accueil
 
-- Hero section : titre, accroche, CTA → `/boutique`
-- Grille d'articles en vedette : articles dont `vedette = true`, ordonnés selon le singleton `accueil`
-- Lien "Voir tout le catalogue" → `/boutique`
+- Hero + CTA vers `/boutique`
+- Sélection en vedette priorisée par le singleton `accueil`
+- Complément automatique avec les articles `vedette: true` non déjà référencés
+- Lien vers le catalogue complet
 
 ### 4.3 `/boutique` — Catalogue
 
-- Grille de tous les articles, toutes catégories confondues
-- **Filtres client-side** (zéro rechargement de page) :
-  - Par `catégorie` (sélecteur)
-  - Par `thème` (sélecteur)
-  - Par `statut` (sélecteur : tous / disponible / réservé / vendu)
-- **Tri client-side** :
-  - Prix croissant
-  - Prix décroissant
-- Les articles avec `statut = vendu` restent visibles mais affichés en grisé avec un badge "Vendu"
-- Les articles avec `statut = réservé` affichent un badge "Réservé"
+- Grille de tous les articles
+- Filtres client-side :
+  - `categorie`
+  - `theme`
+  - `statut` (`disponible` / `reserve` / `vendu`)
+- Tri client-side : prix croissant / décroissant
+- Les articles `vendu` restent visibles, affichés en grisé avec badge/overlay
+- Les articles `reserve` affichent un badge "Réservé"
 
 ### 4.4 `/boutique/[slug]` — Article
 
-- Galerie d'images (1–6 photos)
-- Tous les champs : titre, description, prix, catégorie, thème, statut, quantité
-- Badge statut (disponible / réservé / vendu)
-- Bouton **"Je suis intéressé(e)"** → redirige vers `/contact?item=[slug]`
-  - Désactivé si `statut = vendu`
+- Galerie d'images (1 à 6)
+- Affichage : titre, description, prix, catégorie, thème, statut, quantité
+- Badge de statut
+- CTA contextuel **toujours actif** :
+  - `disponible` → "Commander"
+  - `reserve` → "Signaler votre intérêt"
+  - `vendu` → "Signaler votre intérêt"
+- Redirection vers `/contact?sujet=...` (pas `?item=`)
 
 ### 4.5 `/contact` — Formulaire
 
-Géré par EmailJS. Champs :
+Champs :
 
 | Champ | Type | Requis | Notes |
 |---|---|---|---|
 | `nom` | text | ✅ | |
 | `email` | email | ✅ | |
-| `téléphone` | text | ❌ | Optionnel |
-| `sujet` | text | ✅ | Pré-rempli via `?item=slug` avec `"Intérêt pour : [titre]"` |
+| `telephone` | text | ❌ | Optionnel |
+| `sujet` | text | ✅ | Pré-rempli via `?sujet=...` |
 | `message` | textarea | ✅ | |
 
 Comportement :
-- À l'arrivée sur `/contact?item=slug`, le champ `sujet` est pré-rempli via `URLSearchParams` côté client
-- Soumission via EmailJS JS SDK — aucun backend requis
-- Feedback visuel après envoi (succès / erreur)
+- Pré-remplissage du `sujet` via `URLSearchParams` (`?sujet=`)
+- Validation client-side custom (messages d'erreur par champ)
+- Soumission via `emailjs.sendForm(...)`
+- Feedback visuel succès / erreur + état de chargement
 
 ### 4.6 `/a-propos`
 
-- Contenu entièrement géré via le singleton TinaCMS `a-propos`
-- Photo, nom, texte libre
+- Contenu piloté par le singleton `a-propos`
+- Affichage conditionnel de la photo
+- Rendu du body markdown (`texte`)
 
 ### 4.7 `/404`
 
 - Page custom `src/pages/404.astro`
-- GitHub Pages sert automatiquement `404.html` pour les routes inexistantes
+- GitHub Pages sert `404.html` pour les routes inexistantes
 
 ---
 
 ## 5. Architecture des Données
 
-### 5.1 TinaCMS — structure des fichiers générés
+### 5.1 Fichiers de contenu
 
 ```
 content/
 ├── articles/
-│   ├── bavoir-espace-rose.md
-│   ├── lingette-animaux.md
+│   ├── *.md
 │   └── ...
 └── singletons/
     ├── accueil.md
@@ -184,13 +192,14 @@ content/
 ```
 public/
 └── uploads/
-    ├── bavoir-espace-rose-1.jpg
-    ├── bavoir-espace-rose-2.jpg
+    ├── <slug>-1.webp
+    ├── <slug>-2.webp
     └── ...
 ```
 
-- Toutes les images passent par le composant Astro `<Image>` pour optimisation au build (WebP, resize, lazy loading)
-- Limite recommandée : 6 images par article, < 2MB par image (à documenter dans TinaCMS via `ui.description`)
+- Les images sont servies depuis le repo (aucun CDN externe)
+- Le rendu actuel utilise des balises `<img>` avec lazy/eager loading selon le contexte
+- Limite recommandée : 6 images par article, < 2 Mo/image
 
 ---
 
@@ -200,27 +209,33 @@ public/
 
 ```ts
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
-import tinacms from '@tinacms/astro';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   site: 'https://thelebcreations.github.io',
-  // pas de `base` — le site est servi à la racine
   output: 'static',
-  integrations: [tailwind(), tinacms()],
+  vite: {
+    plugins: [tailwindcss()]
+  }
 });
 ```
-
-> ⚠️ Tous les liens internes et chemins d'assets doivent utiliser le helper `base` d'Astro pour être correctement préfixés.
 
 ### 6.2 TypeScript
 
 ```json
 // tsconfig.json
 {
-  "extends": "astro/tsconfigs/strict"
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
 }
 ```
+
+### 6.3 Liens internes et `base`
+
+- Le site est actuellement servi à la racine du domaine (`site` sans `base`).
+- Les liens sont implémentés en chemins racine (`/boutique`, `/contact`, etc.).
+- Si le site est migré vers un sous-chemin (`username.github.io/repo`), il faudra introduire `base` et adapter les liens.
 
 ---
 
@@ -230,61 +245,85 @@ export default defineConfig({
 
 ```
 Éditeur (TinaCMS UI)
-  → commit sur main (via Tina Cloud)
+  → commit sur main
     → GitHub Actions déclenché
       → npm ci
-      → npm run build
-        → dist/ uploadé sur gh-pages branch
-          → GitHub Pages sert le site
+      → npm run build (tinacms build && astro build)
+        → vérification de dist/admin/index.html
+          → suppression de dist/admin/.gitignore
+            → publication de dist/ sur gh-pages
 ```
 
-### 7.2 GitHub Actions workflow
+### 7.2 Workflow actuel
 
 ```yaml
-# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.4.0
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-      - run: npm run build
+      - name: Build
+        run: npm run build
         env:
+          NODE_OPTIONS: "--max-old-space-size=6144"
           TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+          PUBLIC_EMAILJS_SERVICE_ID: ${{ secrets.PUBLIC_EMAILJS_SERVICE_ID }}
+          PUBLIC_EMAILJS_TEMPLATE_ID: ${{ secrets.PUBLIC_EMAILJS_TEMPLATE_ID }}
+          PUBLIC_EMAILJS_PUBLIC_KEY: ${{ secrets.PUBLIC_EMAILJS_PUBLIC_KEY }}
 
-      - uses: peaceiris/actions-gh-pages@v4
+      - name: Verify Tina Admin Output
+        shell: bash
+        run: |
+          if [ ! -f "dist/admin/index.html" ]; then
+            echo "ERROR: dist/admin/index.html is missing. Tina admin was not generated."
+            echo "dist/ contents:" && ls -la dist || true
+            exit 1
+          fi
+
+      - name: Unignore Tina Admin Files For Publish
+        shell: bash
+        run: |
+          rm -f dist/admin/.gitignore
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          publish_branch: gh-pages
 ```
 
 ### 7.3 Secrets GitHub requis
 
-| Secret | Valeur |
+| Secret | Usage |
 |---|---|
-| `TINA_CLIENT_ID` | Depuis Tina Cloud dashboard |
-| `TINA_TOKEN` | Depuis Tina Cloud dashboard |
-| `PUBLIC_EMAILJS_SERVICE_ID` | Depuis EmailJS dashboard |
-| `PUBLIC_EMAILJS_TEMPLATE_ID` | Depuis EmailJS dashboard |
-| `PUBLIC_EMAILJS_PUBLIC_KEY` | Depuis EmailJS dashboard |
-
-> Les variables préfixées `PUBLIC_` sont exposées côté client par Astro. EmailJS n'a pas besoin d'être secret (clé publique uniquement).
+| `TINA_CLIENT_ID` | Build TinaCMS |
+| `TINA_TOKEN` | Build TinaCMS |
+| `PUBLIC_EMAILJS_SERVICE_ID` | Service EmailJS (client) |
+| `PUBLIC_EMAILJS_TEMPLATE_ID` | Template EmailJS (client) |
+| `PUBLIC_EMAILJS_PUBLIC_KEY` | Clé publique EmailJS |
 
 ---
 
@@ -303,12 +342,12 @@ Message :
 {{message}}
 ```
 
-### 8.2 Intégration
+### 8.2 Intégration actuelle
 
-- SDK chargé via `<script>` dans le composant contact
+- SDK importé dans le script du composant `ContactForm.astro`
 - Initialisation avec `PUBLIC_EMAILJS_PUBLIC_KEY`
-- Appel `emailjs.send(serviceId, templateId, templateParams)` sur submit
-- Validation HTML5 native + feedback post-envoi géré en state local
+- Envoi via `emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form)`
+- Gestion des états : validation, loading, succès, erreur
 
 ---
 
@@ -323,30 +362,35 @@ Message :
 │   ├── articles/
 │   └── singletons/
 ├── public/
+│   ├── admin/
 │   └── uploads/
+├── scripts/
+│   └── vinted-ingest.mjs
 ├── src/
+│   ├── content.config.ts          # Validation Astro Content Collections
 │   ├── components/
-│   │   ├── ArticleCard.astro       # Carte article (catalogue + accueil)
-│   │   ├── ArticleGallery.astro    # Galerie images page article
-│   │   ├── CatalogueFilters.astro  # Filtres + tri client-side
-│   │   ├── ContactForm.astro       # Formulaire EmailJS
-│   │   └── StatusBadge.astro       # Badge disponible/réservé/vendu
+│   │   ├── ArticleCard.astro
+│   │   ├── ArticleGallery.astro
+│   │   ├── CatalogueFilters.astro
+│   │   ├── ContactForm.astro
+│   │   └── StatusBadge.astro
 │   ├── layouts/
-│   │   └── Base.astro              # Layout principal (nav, footer)
+│   │   └── Base.astro
 │   ├── pages/
-│   │   ├── index.astro             # Accueil
+│   │   ├── index.astro
 │   │   ├── boutique/
-│   │   │   ├── index.astro         # Catalogue
-│   │   │   └── [slug].astro        # Page article
+│   │   │   ├── index.astro
+│   │   │   └── [slug].astro
 │   │   ├── contact.astro
 │   │   ├── a-propos.astro
 │   │   └── 404.astro
 │   └── styles/
-│       └── global.css              # Imports Tailwind
+│       └── global.css
 ├── tina/
-│   └── config.ts                   # Schéma TinaCMS
+│   ├── config.ts
+│   └── __generated__/
 ├── astro.config.mjs
-├── tailwind.config.mjs
+├── package.json
 └── tsconfig.json
 ```
 
@@ -356,9 +400,9 @@ Message :
 
 | Point | Détail |
 |---|---|
-| Repo size | Images stockées dans le repo — surveiller la taille (limite GitHub : 1GB). Archiver les articles vendus anciens si nécessaire. |
-| Tina Cloud free tier | Vérifier les limites actuelles (utilisateurs, records) avant tout changement d'éditeurs. |
-| EmailJS free tier | 200 emails/mois. Suffisant pour un petit shop, à surveiller en cas de croissance. |
-| GitHub Pages `base` path | Tout lien relatif doit utiliser le helper `base` d'Astro — à documenter pour les futurs contributeurs. |
-| Filtres client-side | Tous les articles sont chargés en une fois. Performance acceptable jusqu'à ~500 articles. Au-delà, envisager une pagination statique. |
-| TinaCMS build | Le build Astro consomme les tokens Tina Cloud — `TINA_CLIENT_ID` et `TINA_TOKEN` doivent être présents en CI. |
+| Taille du repo | Images stockées dans le repo : surveiller la croissance (limite soft GitHub) |
+| Tina Cloud free tier | Vérifier régulièrement les quotas/limites |
+| EmailJS free tier | 200 emails/mois : surveiller si volume en hausse |
+| Liens racine | Le projet suppose un déploiement à la racine du domaine ; migration vers un sous-chemin = ajustements nécessaires |
+| Filtres client-side | Tous les articles sont chargés en une fois ; au-delà de quelques centaines, envisager pagination/segmentation |
+| Build Tina | `npm run build` dépend de `TINA_CLIENT_ID` et `TINA_TOKEN` en CI |
