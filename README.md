@@ -38,3 +38,35 @@ This command also starts the TinaCMS development server, which is available at `
 ```bash
 npm run build
 ```
+
+## Ingest A Vinted Article
+
+Use the CLI to create one new article markdown file and download its images.
+
+### Dry-run (no file writes)
+```powershell
+npm run ingest:vinted -- `
+  --url https://www.vinted.fr/items/8619691696-sac-fourre-tout `
+  --slug sac-fourre-tout-guitare-breton `
+  --quantite 1 `
+  --categorie sacs `
+  --theme musique `
+  --vedette true `
+  --dry-run
+```
+
+### Write files
+```powershell
+npm run ingest:vinted -- `
+  --url https://www.vinted.fr/items/8619691696-sac-fourre-tout `
+  --slug sac-fourre-tout-guitare-breton `
+  --quantite 1 `
+  --categorie sacs `
+  --theme musique `
+  --vedette true
+```
+
+Notes:
+- `categorie` and `theme` are validated against allowed values from `tina/config.ts`.
+- The body text is formatted sentence by sentence (split on `.`), with two trailing spaces and a newline per sentence for markdown line breaks.
+- Slug collisions are blocked (existing article file causes an error).

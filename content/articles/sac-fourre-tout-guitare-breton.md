@@ -9,6 +9,7 @@ images:
   - /uploads/sac-fourre-tout-guitare-breton-1.webp
   - /uploads/sac-fourre-tout-guitare-breton-2.webp
   - /uploads/sac-fourre-tout-guitare-breton-3.webp
+  - /uploads/sac-fourre-tout-guitare-breton-4.webp
 vedette: true
 ---
 
