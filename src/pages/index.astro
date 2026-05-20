@@ -97,27 +97,33 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
   /* Hero                                                                 */
   /* ------------------------------------------------------------------ */
   .hero {
-    padding:    4rem 0 3rem;
     text-align: center;
-    max-width:  42rem;
+    max-width:  58rem;
     margin:     0 auto;
+  }
+
+  .hero-content {
+    padding: 0;
+    max-width: 58rem;
+    margin: 0 auto;
   }
 
   .hero-eyebrow {
     font-size:      0.75rem;
     font-weight:    500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color:          var(--color-secondary, #739371);
-    margin:         0 0 1rem;
+    margin:         0 0 0.75rem;
+    white-space:    nowrap;
   }
 
   .hero-title {
     font-family:  var(--font-display, serif);
-    font-size:    clamp(1.882rem, 5vw, 2.824rem);
+    font-size:    2.4rem;
     font-weight:  600;
-    line-height:  1.2;
-    margin:       0 0 1.25rem;
+    line-height:  1.03;
+    margin:       0 0 0;
     color:        var(--color-text, #2B2D42);
   }
 
@@ -131,14 +137,14 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
     font-size:   1.0625rem;
     color:       var(--color-text-muted, #6B6D80);
     line-height: 1.7;
-    margin:      0 0 2rem;
+    margin:      0 0 1.6rem;
   }
 
   /* ------------------------------------------------------------------ */
   /* Articles en vedette                                                  */
   /* ------------------------------------------------------------------ */
   .featured-section {
-    padding: 2rem 0 3rem;
+    padding: 0.3rem 0 3rem;
   }
 
   .section-header {
@@ -245,11 +251,27 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
   /* Responsive                                                           */
   /* ------------------------------------------------------------------ */
   @media (max-width: 640px) {
-    .hero { padding: 2.5rem 0 2rem; }
+    .hero {
+      max-width: 42rem;
+    }
+
+    .hero-content {
+      max-width: 42rem;
+    }
+
+    .hero-eyebrow {
+      white-space: normal;
+    }
 
     .about-strip-content {
       flex-direction: column;
       text-align:     center;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .hero-title br {
+      display: none;
     }
   }
 </style>
