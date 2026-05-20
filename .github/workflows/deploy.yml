@@ -34,6 +34,16 @@ jobs:
           PUBLIC_EMAILJS_TEMPLATE_ID:   ${{ secrets.PUBLIC_EMAILJS_TEMPLATE_ID }}
           PUBLIC_EMAILJS_PUBLIC_KEY:    ${{ secrets.PUBLIC_EMAILJS_PUBLIC_KEY }}
 
+      - name: Verify Tina Admin Output
+        shell: bash
+        run: |
+          if [ ! -f "dist/admin/index.html" ]; then
+            echo "ERROR: dist/admin/index.html is missing. Tina admin was not generated."
+            echo "Check TINA_CLIENT_ID and TINA_TOKEN secrets and build logs."
+            echo "dist/ contents:" && ls -la dist || true
+            exit 1
+          fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
