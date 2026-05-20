@@ -44,6 +44,11 @@ jobs:
             exit 1
           fi
 
+      - name: Unignore Tina Admin Files For Publish
+        shell: bash
+        run: |
+          rm -f dist/admin/.gitignore
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4.1.0
         with:
