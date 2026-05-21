@@ -78,11 +78,12 @@ const { images, titre } = Astro.props;
     display:        flex;
     flex-direction: column;
     gap:            0.75rem;
+    width:          min(100%, 30rem);
   }
 
   /* Image principale */
   .gallery-main {
-    aspect-ratio:  1 / 1;
+    aspect-ratio:  3 / 4;
     border-radius: 0.75rem;
     overflow:      hidden;
     background:    var(--color-bg, #FDFBF7);
@@ -105,7 +106,7 @@ const { images, titre } = Astro.props;
 
   .thumb-btn {
     width:         4.5rem;
-    height:        4.5rem;
+    aspect-ratio:  3 / 4;
     padding:       0;
     border:        2px solid var(--color-border, #E2DDD5);
     border-radius: 0.5rem;
@@ -142,13 +143,8 @@ const { images, titre } = Astro.props;
 
   /* Desktop — galerie en colonne à côté du contenu */
   @media (min-width: 768px) {
-    .gallery-main {
-      aspect-ratio: 4 / 3;
-    }
-
     .thumb-btn {
-      width:  5rem;
-      height: 5rem;
+      width: 5rem;
     }
   }
 </style>

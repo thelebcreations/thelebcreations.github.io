@@ -118,6 +118,7 @@ autre
 - Hero + CTA vers `/boutique`
 - Sélection en vedette priorisée par le singleton `accueil`
 - Complément automatique avec les articles `vedette: true` non déjà référencés
+- Les visuels des cartes en vedette utilisent un affichage portrait en ratio `3:4`, aligné sur les images source (600x800)
 - Lien vers le catalogue complet
 
 ### 4.3 `/boutique` — Catalogue
@@ -134,6 +135,7 @@ autre
 ### 4.4 `/boutique/[slug]` — Article
 
 - Galerie d'images (1 à 6)
+- La galerie principale et les miniatures respectent un affichage portrait en ratio `3:4`, sans recadrage haut/bas des visuels source (600x800)
 - Affichage : titre, description, prix, catégorie, thème, statut, quantité
 - Badge de statut
 - CTA contextuel **toujours actif** :
