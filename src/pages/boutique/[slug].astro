@@ -63,7 +63,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
 >
 
   <!-- Fil d'Ariane -->
-  <nav class="breadcrumb" aria-label="Fil d'Ariane">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane" data-pagefind-ignore>
     <a href="/">Accueil</a>
     <span aria-hidden="true">›</span>
     <a href="/boutique">Boutique</a>
@@ -72,7 +72,10 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
   </nav>
 
   <!-- Contenu principal -->
-  <div class="article-layout">
+  <div class="article-layout" data-pagefind-body>
+
+    <span data-pagefind-meta={`image[${images[0]}]`} hidden></span>
+    <span data-pagefind-meta={`statut[${statut}]`} hidden></span>
 
     <!-- Colonne gauche : galerie -->
     <div class="article-gallery-col">
@@ -118,7 +121,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
       </div>
 
       <!-- CTA — actif pour tous les statuts -->
-      <div class="article-cta">
+      <div class="article-cta" data-pagefind-ignore>
         <a href={contactUrl} class={`btn-cta btn-${statut}`}>
           {ctaLabel}
         </a>

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "tinacms dev -c \"astro dev\"",
-    "build": "tinacms build && astro build",
+    "build": "tinacms build && astro build && pagefind --site dist --force-language fr --glob \"boutique/*/index.html\" --root-selector \"[data-pagefind-body]\"",
     "preview": "astro preview",
     "astro": "astro",
     "ingest:vinted": "node scripts/vinted-ingest.mjs",
@@ -19,6 +19,7 @@
     "@tinacms/cli": "^2.3.1",
     "astro": "^6.3.3",
     "daisyui": "^5.5.19",
+    "pagefind": "^1.5.2",
     "tailwindcss": "^4.3.0",
     "tinacms": "^3.8.1"
   }

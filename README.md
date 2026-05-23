@@ -15,6 +15,7 @@ Boutique Créations Faites Main — a static e-commerce website for handmade cre
 - **`/` (Accueil):** Hero section, featured creations, and quick links.
 - **`/boutique` (Catalogue):** Complete catalog with client-side filtering and sorting.
 - **`/boutique/[slug]` (Article):** Individual item details, image gallery, and availability status.
+- **Search modal:** Client-side search powered by Pagefind (indexed at build time).
 - **`/a-propos` (À propos):** Presentation of the creator.
 - **`/contact`:** Contact form integrated with EmailJS.
 - **`/404`:** Custom error page.
@@ -34,10 +35,27 @@ npm run dev
 The site will be available at `http://localhost:4321`.
 This command also starts the TinaCMS development server, which is available at `http://localhost:4321/admin/index.html`.
 
+Note: Search indexing is build-time only, so search is not available in `npm run dev` mode.
+
 ### 3. Build for production
 ```bash
 npm run build
 ```
+
+This build command also generates the Pagefind index in `dist/pagefind/`.
+
+### 4. Preview the production build (including search)
+```bash
+npm run preview
+```
+
+Use this mode to test search behavior locally.
+
+## Search Behavior (Pagefind)
+
+- Search scope is product detail pages only (`/boutique/[slug]`).
+- Query length must be at least 3 characters.
+- Results prioritize `disponible` articles over `reserve` and `vendu`.
 
 ## Ingest A Vinted Article
 

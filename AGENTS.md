@@ -17,6 +17,7 @@ Primary goals:
 - Styling: Tailwind CSS v4 through Vite plugin + DaisyUI + custom CSS
 - Content source: Markdown files in `content/` validated by Astro content collections
 - CMS layer: TinaCMS schema in `tina/config.ts` editing repo-backed Markdown
+- Search: Pagefind index generated at build time + client modal in `SearchModal.astro`
 - Contact: EmailJS client-side submission in `ContactForm.astro`
 - Deployment: GitHub Actions builds `dist/` and publishes to `gh-pages`
 
@@ -25,6 +26,9 @@ Primary goals:
 - Product status values are stored as `disponible`, `reserve`, `vendu`.
 - Product CTA on product pages stays active for all statuses and links to `/contact?sujet=...`.
 - Contact prefill currently reads query parameter `sujet`.
+- Search indexes only product pages (`/boutique/[slug]`).
+- Search requires at least 3 characters before querying.
+- Search ranks `disponible` results ahead of `reserve` and `vendu`.
 - Root-relative links are used throughout and assume root-domain deployment.
 
 ## Repository layout
@@ -43,6 +47,7 @@ Primary goals:
 |- src/
 |  |- content.config.ts       # Astro content schemas and enum validation
 |  |- components/
+|  |  |- SearchModal.astro     # Client search modal using Pagefind runtime API
 |  |- layouts/
 |  |- pages/
 |  |- styles/
@@ -113,6 +118,11 @@ Build production output:
 npm run build
 ```
 
+Notes:
+
+- Build runs `tinacms build`, `astro build`, then Pagefind indexing into `dist/pagefind/`.
+- Search is not available in `npm run dev` because index generation is build-time only.
+
 Preview production build:
 
 ```bash
@@ -152,6 +162,13 @@ For functional UI/content updates, also verify manually in dev mode:
 - Product page CTA behavior by status
 - Contact subject prefill via `?sujet=`
 - Tina admin access at `/admin/index.html`
+
+For search-related updates, verify in preview mode (`npm run build` + `npm run preview`):
+
+- Search opens from nav and focuses input
+- Minimum query length gating (3 characters)
+- Results include only product pages
+- Status-priority ordering (`disponible` > `reserve` > `vendu`)
 
 If you modify docs-relevant behavior, update README.md and AGENTS.md accordingly.
 
