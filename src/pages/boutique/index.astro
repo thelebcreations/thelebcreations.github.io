@@ -3,12 +3,20 @@ import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import CatalogueFilters from '../../components/CatalogueFilters.astro';
 import { getCollection } from 'astro:content';
+import {
+  CATEGORIE_OPTIONS,
+  THEME_OPTIONS,
+  STATUT_OPTIONS,
+} from '../../../tina/options';
 
 const articles = await getCollection('article');
 
 // Listes dédupliquées pour les selects des filtres
-const categories = [...new Set(articles.map(a => a.data.categorie))].sort();
-const themes      = [...new Set(articles.map(a => a.data.theme))].sort();
+const categoryValues = new Set(articles.map(a => a.data.categorie));
+const categories = CATEGORIE_OPTIONS.filter(({ value }) => categoryValues.has(value));
+const themeValues = new Set(articles.map(a => a.data.theme));
+const themes = THEME_OPTIONS.filter(({ value }) => themeValues.has(value));
+const statuts = STATUT_OPTIONS;
 ---
 
 <Base
@@ -34,7 +42,7 @@ const themes      = [...new Set(articles.map(a => a.data.theme))].sort();
     </div>
   ) : (
     <>
-      <CatalogueFilters categories={categories} themes={themes} />
+      <CatalogueFilters categories={categories} themes={themes} statuts={statuts} />
 
       <div id="catalogue-grid" class="articles-grid">
         {articles.map(article => (

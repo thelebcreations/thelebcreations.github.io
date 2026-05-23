@@ -3,17 +3,12 @@
 // pour éviter de les dupliquer ici.
 
 interface Props {
-  categories: string[];
-  themes:     string[];
+  categories: Array<{ value: string; label: string }>;
+  themes: Array<{ value: string; label: string }>;
+  statuts: Array<{ value: string; label: string }>;
 }
 
-const { categories, themes } = Astro.props;
-
-const statuts = [
-  { value: 'disponible', label: 'Disponible' },
-  { value: 'reserve',    label: 'Réservé'    },
-  { value: 'vendu',      label: 'Vendu'      },
-];
+const { categories, themes, statuts } = Astro.props;
 
 const tris = [
   { value: 'prix-asc',  label: 'Prix croissant'    },
@@ -28,8 +23,8 @@ const tris = [
     <label for="filter-categorie" class="filter-label">Catégorie</label>
     <select id="filter-categorie" class="filter-select" data-filter="categorie">
       <option value="">Toutes</option>
-      {categories.map(c => (
-        <option value={c}>{c.replace(/-/g, ' ')}</option>
+      {categories.map(({ value, label }) => (
+        <option value={value}>{label}</option>
       ))}
     </select>
   </div>
@@ -39,8 +34,8 @@ const tris = [
     <label for="filter-theme" class="filter-label">Thème</label>
     <select id="filter-theme" class="filter-select" data-filter="theme">
       <option value="">Tous</option>
-      {themes.map(t => (
-        <option value={t}>{t}</option>
+      {themes.map(({ value, label }) => (
+        <option value={value}>{label}</option>
       ))}
     </select>
   </div>
@@ -59,7 +54,7 @@ const tris = [
   <!-- Tri -->
   <div class="filter-group">
     <label for="filter-tri" class="filter-label">Trier par</label>
-    <select id="filter-tri" class="filter-select" id="filter-tri">
+    <select id="filter-tri" class="filter-select">
       <option value="">—</option>
       {tris.map(t => (
         <option value={t.value}>{t.label}</option>

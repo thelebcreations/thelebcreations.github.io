@@ -1,6 +1,7 @@
 ---
 import StatusBadge from './StatusBadge.astro';
 import type { ArticleStatut, ArticleCategorie, ArticleTheme } from '../content.config';
+import { getCategoryLabel, getThemeLabel, getStatutLabel } from '../utils/taxonomy';
 
 interface Props {
   slug:      string;
@@ -17,6 +18,9 @@ const { slug, titre, prix, statut, images, categorie, theme, quantite } = Astro.
 
 const isSold = statut === 'vendu';
 const image  = images[0];
+const categoryLabel = getCategoryLabel(categorie);
+const themeLabel = getThemeLabel(theme);
+const soldLabel = getStatutLabel('vendu');
 ---
 
 <article class={`article-card ${isSold ? 'is-sold' : ''}`}>
@@ -31,7 +35,7 @@ const image  = images[0];
         loading="lazy"
         decoding="async"
       />
-      {isSold && <div class="sold-overlay">Vendu</div>}
+      {isSold && <div class="sold-overlay">{soldLabel}</div>}
     </div>
 
     <!-- Contenu -->
@@ -49,8 +53,8 @@ const image  = images[0];
       </div>
 
       <div class="card-tags">
-        <span class="card-tag">{categorie.replace(/-/g, ' ')}</span>
-        <span class="card-tag">{theme}</span>
+        <span class="card-tag">{categoryLabel}</span>
+        <span class="card-tag">{themeLabel}</span>
       </div>
     </div>
 

@@ -109,11 +109,23 @@
 <script>
   import emailjs from '@emailjs/browser';
 
-  const SERVICE_ID  = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID  as string;
-  const TEMPLATE_ID = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID as string;
-  const PUBLIC_KEY  = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY  as string;
+  const SERVICE_ID  = import.meta.env.PUBLIC_EMAILJS_SERVICE_ID  as string | undefined;
+  const TEMPLATE_ID = import.meta.env.PUBLIC_EMAILJS_TEMPLATE_ID as string | undefined;
+  const PUBLIC_KEY  = import.meta.env.PUBLIC_EMAILJS_PUBLIC_KEY  as string | undefined;
 
-  emailjs.init(PUBLIC_KEY);
+  const isConfigured = (value: string | undefined): boolean =>
+    Boolean(value && value !== 'undefined' && value !== 'null');
+
+  const hasEmailJsConfig =
+    isConfigured(SERVICE_ID) &&
+    isConfigured(TEMPLATE_ID) &&
+    isConfigured(PUBLIC_KEY);
+
+  if (hasEmailJsConfig) {
+    emailjs.init(PUBLIC_KEY!);
+  } else {
+    console.warn('[ContactForm] Configuration EmailJS manquante. Vérifiez PUBLIC_EMAILJS_SERVICE_ID, PUBLIC_EMAILJS_TEMPLATE_ID et PUBLIC_EMAILJS_PUBLIC_KEY.');
+  }
 
   // -------------------------------------------------------------------------
   // Pré-remplir le sujet depuis l'URL (?sujet=... ou ?item=...)
@@ -124,7 +136,7 @@
 
   const sujetParam = params.get('sujet');
   if (sujetParam && sujetInput) {
-    sujetInput.value = decodeURIComponent(sujetParam);
+    sujetInput.value = sujetParam;
   }
 
   // -------------------------------------------------------------------------
@@ -176,8 +188,20 @@
   const successEl = document.getElementById('form-success')  as HTMLDivElement;
   const errorEl   = document.getElementById('form-error')    as HTMLDivElement;
 
+  if (!hasEmailJsConfig) {
+    submitBtn.disabled = true;
+    btnLabel.textContent = 'Formulaire indisponible';
+    errorEl.textContent = 'Le formulaire est temporairement indisponible (configuration EmailJS manquante).';
+    errorEl.hidden = false;
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!hasEmailJsConfig) {
+      errorEl.hidden = false;
+      return;
+    }
 
     // Masquer les feedbacks précédents
     successEl.hidden = true;

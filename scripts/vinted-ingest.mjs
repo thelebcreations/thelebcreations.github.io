@@ -7,7 +7,7 @@ import os from "node:os";
 const ROOT = process.cwd();
 const ARTICLES_DIR = path.join(ROOT, "content", "articles");
 const UPLOADS_DIR = path.join(ROOT, "public", "uploads");
-const TINA_CONFIG_PATH = path.join(ROOT, "tina", "config.ts");
+const TINA_OPTIONS_PATH = path.join(ROOT, "tina", "options.ts");
 
 async function main() {
   const args = withNpmConfigFallback(parseArgs(process.argv.slice(2)));
@@ -54,9 +54,9 @@ async function main() {
     fail(`Slug collision: ${path.relative(ROOT, articlePath)} already exists.`);
   }
 
-  const configSource = await readRequiredFile(TINA_CONFIG_PATH);
-  const allowedCategories = getAllowedValuesFromTinaConfig(configSource, "categorie");
-  const allowedThemes = getAllowedValuesFromTinaConfig(configSource, "theme");
+  const optionsSource = await readRequiredFile(TINA_OPTIONS_PATH);
+  const allowedCategories = getAllowedValuesFromOptions(optionsSource, "CATEGORIE_OPTIONS");
+  const allowedThemes = getAllowedValuesFromOptions(optionsSource, "THEME_OPTIONS");
 
   const categorie = String(args.categorie).trim();
   const theme = String(args.theme).trim();
@@ -321,22 +321,8 @@ async function readRequiredFile(filePath) {
   }
 }
 
-function getAllowedValuesFromTinaConfig(configSource, fieldName) {
-  const fieldRefRegex = new RegExp(
-    `name:\\s*["']${escapeRegExp(fieldName)}["'][\\s\\S]*?options:\\s*([A-Za-z0-9_]+|\\[[\\s\\S]*?\\])`,
-    "m",
-  );
-  const fieldRefMatch = configSource.match(fieldRefRegex);
-
-  if (!fieldRefMatch) {
-    fail(`Could not locate options for field '${fieldName}' in tina/config.ts.`);
-  }
-
-  const optionRef = fieldRefMatch[1].trim();
-  const optionBlock = optionRef.startsWith("[")
-    ? optionRef
-    : extractConstArrayBlock(configSource, optionRef);
-
+function getAllowedValuesFromOptions(optionsSource, constName) {
+  const optionBlock = extractConstArrayBlock(optionsSource, constName);
   const valueRegex = /value:\s*["']([^"']+)["']/g;
   const values = [];
   let match;
@@ -345,7 +331,7 @@ function getAllowedValuesFromTinaConfig(configSource, fieldName) {
   }
 
   if (values.length === 0) {
-    fail(`No option values found for field '${fieldName}' in tina/config.ts.`);
+    fail(`No option values found in '${constName}' within tina/options.ts.`);
   }
 
   return values;
@@ -355,7 +341,7 @@ function extractConstArrayBlock(source, constName) {
   const startRegex = new RegExp(`const\\s+${escapeRegExp(constName)}\\s*=\\s*\\[`, "m");
   const startMatch = source.match(startRegex);
   if (!startMatch || startMatch.index === undefined) {
-    fail(`Could not resolve options constant '${constName}' in tina/config.ts.`);
+    fail(`Could not resolve options constant '${constName}' in tina/options.ts.`);
   }
 
   const startIndex = startMatch.index + startMatch[0].length - 1;

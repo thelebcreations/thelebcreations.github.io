@@ -1,5 +1,6 @@
 ---
 import type { ArticleStatut } from '../../src/content.config';
+import { getStatutLabel } from '../utils/taxonomy';
 
 interface Props {
   statut: ArticleStatut;
@@ -7,13 +8,14 @@ interface Props {
 
 const { statut } = Astro.props;
 
-const config: Record<ArticleStatut, { label: string; cls: string }> = {
-  disponible: { label: 'Disponible', cls: 'badge-disponible' },
-  reserve:    { label: 'Réservé',    cls: 'badge-reserve'    },
-  vendu:      { label: 'Vendu',      cls: 'badge-vendu'      },
+const config: Record<ArticleStatut, { cls: string }> = {
+  disponible: { cls: 'badge-disponible' },
+  reserve:    { cls: 'badge-reserve'    },
+  vendu:      { cls: 'badge-vendu'      },
 };
 
-const { label, cls } = config[statut];
+const { cls } = config[statut];
+const label = getStatutLabel(statut);
 ---
 
 <span class={`status-badge ${cls}`}>{label}</span>

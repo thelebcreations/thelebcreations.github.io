@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import ArticleGallery from '../../components/ArticleGallery.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
 import { getCollection, render } from 'astro:content';
+import { getCategoryLabel, getThemeLabel, getStatutLabel } from '../../utils/taxonomy';
 
 export async function getStaticPaths() {
   const articles = await getCollection('article');
@@ -25,7 +26,9 @@ const {
   images,
 } = article.data;
 
-const labelCategorie = categorie.replace(/-/g, ' ');
+const labelCategorie = getCategoryLabel(categorie);
+const labelTheme = getThemeLabel(theme);
+const labelDisponible = getStatutLabel('disponible');
 
 // CTA contextuel selon le statut
 // Tous les états mènent au formulaire de contact car les articles
@@ -94,11 +97,11 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
       <dl class="article-info">
         <div class="info-row">
           <dt>Thème</dt>
-          <dd class="capitalize">{theme}</dd>
+          <dd>{labelTheme}</dd>
         </div>
         {statut === 'disponible' && (
           <div class="info-row">
-            <dt>Disponible</dt>
+            <dt>{labelDisponible}</dt>
             <dd>{quantite} exemplaire{quantite > 1 ? 's' : ''}</dd>
           </div>
         )}
@@ -240,8 +243,6 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
     color:       var(--color-text, #2B2D42);
     font-weight: 500;
   }
-
-  .capitalize { text-transform: capitalize; }
 
   /* Description */
   .article-description {
