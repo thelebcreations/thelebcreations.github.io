@@ -17,6 +17,26 @@
   --color-border: #E2DDD5;
 }
 
+:root {
+  --color-bg: #fdfbf7;
+  --color-surface: #ffffff;
+  --color-text: #2b2d42;
+  --color-text-muted: #6b6d80;
+  --color-accent: #e6997c;
+  --color-accent-hover: #d88463;
+  --color-secondary: #739371;
+  --color-secondary-hover: #8ab472;
+  --color-highlight: #ffb703;
+  --color-border: #e2ddd5;
+
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  --nav-height: 4rem;
+  --max-width: 72rem;
+  --padding-x: 1.5rem;
+}
+
 /* Configuration de DaisyUI avec une déclinaison de notre palette */
 @plugin "daisyui" {
   themes: custom --default;

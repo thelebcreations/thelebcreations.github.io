@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import ArticleGallery from '../../components/ArticleGallery.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
 import { getCollection, render } from 'astro:content';
+import type { ArticleStatut } from '../../content.config';
 import { getCategoryLabel, getThemeLabel, getStatutLabel } from '../../utils/taxonomy';
 
 export async function getStaticPaths() {
@@ -49,7 +50,7 @@ const cta = {
     hint:  'Cet article est vendu — il peut être fabriqué sur demande.',
     sujet: `Intérêt pour : ${titre} (vendu)`,
   },
-} satisfies Record<typeof statut, { label: string; hint: string; sujet: string }>;
+} satisfies Record<ArticleStatut, { label: string; hint: string; sujet: string }>;
 
 const { label: ctaLabel, hint: ctaHint, sujet: ctaSujet } = cta[statut];
 const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
@@ -58,7 +59,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
 <Base
   titre={titre}
   description={`${titre} — ${labelCategorie}, thème ${theme}. ${prix} €`}
-  image={images[0]}
+  image={new URL(images[0], Astro.site).toString()}
 >
 
   <!-- Fil d'Ariane -->

@@ -7,12 +7,11 @@ interface Props {
 const { images, titre } = Astro.props;
 ---
 
-<div class="gallery">
+<div class="gallery" data-article-gallery>
 
   <!-- Image principale -->
   <div class="gallery-main">
     <img
-      id="gallery-main-img"
       src={images[0]}
       alt={titre}
       class="main-image"
@@ -48,27 +47,40 @@ const { images, titre } = Astro.props;
 </div>
 
 <script>
-  const mainImg  = document.getElementById('gallery-main-img') as HTMLImageElement;
-  const thumbBtns = document.querySelectorAll<HTMLButtonElement>('.thumb-btn');
+  // Scope les sélections à chaque galerie pour éviter les collisions inter-composants.
+  const galleries = document.querySelectorAll<HTMLElement>('[data-article-gallery]');
 
-  thumbBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const src = btn.dataset.src!;
+  galleries.forEach((gallery) => {
+    const mainImg = gallery.querySelector<HTMLImageElement>('.main-image');
+    const thumbBtns = gallery.querySelectorAll<HTMLButtonElement>('.thumb-btn');
 
-      // Transition douce sur l'image principale
-      mainImg.style.opacity = '0';
-      setTimeout(() => {
-        mainImg.src = src;
-        mainImg.style.opacity = '1';
-      }, 150);
+    if (!mainImg || thumbBtns.length === 0) {
+      return;
+    }
 
-      // Mettre à jour l'état actif
-      thumbBtns.forEach(b => {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-pressed', 'false');
+    thumbBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const src = btn.dataset.src;
+
+        if (!src) {
+          return;
+        }
+
+        // Transition douce sur l'image principale
+        mainImg.style.opacity = '0';
+        setTimeout(() => {
+          mainImg.src = src;
+          mainImg.style.opacity = '1';
+        }, 150);
+
+        // Mettre à jour l'état actif
+        thumbBtns.forEach((thumb) => {
+          thumb.classList.remove('is-active');
+          thumb.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
       });
-      btn.classList.add('is-active');
-      btn.setAttribute('aria-pressed', 'true');
     });
   });
 </script>

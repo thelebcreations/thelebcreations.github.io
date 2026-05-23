@@ -3,11 +3,12 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { pathToFileURL } from "node:url";
 
 const ROOT = process.cwd();
 const ARTICLES_DIR = path.join(ROOT, "content", "articles");
 const UPLOADS_DIR = path.join(ROOT, "public", "uploads");
-const TINA_OPTIONS_PATH = path.join(ROOT, "tina", "options.ts");
+const TINA_OPTIONS_PATH = path.join(ROOT, "tina", "options.js");
 
 async function main() {
   const args = withNpmConfigFallback(parseArgs(process.argv.slice(2)));
@@ -54,9 +55,9 @@ async function main() {
     fail(`Slug collision: ${path.relative(ROOT, articlePath)} already exists.`);
   }
 
-  const optionsSource = await readRequiredFile(TINA_OPTIONS_PATH);
-  const allowedCategories = getAllowedValuesFromOptions(optionsSource, "CATEGORIE_OPTIONS");
-  const allowedThemes = getAllowedValuesFromOptions(optionsSource, "THEME_OPTIONS");
+  const { CATEGORIE_OPTIONS, THEME_OPTIONS } = await loadTinaOptions();
+  const allowedCategories = getAllowedValues(CATEGORIE_OPTIONS, "CATEGORIE_OPTIONS");
+  const allowedThemes = getAllowedValues(THEME_OPTIONS, "THEME_OPTIONS");
 
   const categorie = String(args.categorie).trim();
   const theme = String(args.theme).trim();
@@ -313,59 +314,28 @@ function parseBoolean(value) {
   return null;
 }
 
-async function readRequiredFile(filePath) {
+async function loadTinaOptions() {
   try {
-    return await fs.readFile(filePath, "utf8");
+    return await import(pathToFileURL(TINA_OPTIONS_PATH).href);
   } catch (error) {
-    fail(`Cannot read required file: ${path.relative(ROOT, filePath)}. ${error.message}`);
+    fail(`Cannot import tina/options.js. ${error.message}`);
   }
 }
 
-function getAllowedValuesFromOptions(optionsSource, constName) {
-  const optionBlock = extractConstArrayBlock(optionsSource, constName);
-  const valueRegex = /value:\s*["']([^"']+)["']/g;
-  const values = [];
-  let match;
-  while ((match = valueRegex.exec(optionBlock)) !== null) {
-    values.push(match[1]);
+function getAllowedValues(options, optionName) {
+  if (!Array.isArray(options)) {
+    fail(`'${optionName}' in tina/options.js must be an array.`);
   }
 
+  const values = options
+    .map((option) => (typeof option?.value === "string" ? option.value : ""))
+    .filter(Boolean);
+
   if (values.length === 0) {
-    fail(`No option values found in '${constName}' within tina/options.ts.`);
+    fail(`No option values found in '${optionName}' within tina/options.js.`);
   }
 
   return values;
-}
-
-function extractConstArrayBlock(source, constName) {
-  const startRegex = new RegExp(`const\\s+${escapeRegExp(constName)}\\s*=\\s*\\[`, "m");
-  const startMatch = source.match(startRegex);
-  if (!startMatch || startMatch.index === undefined) {
-    fail(`Could not resolve options constant '${constName}' in tina/options.ts.`);
-  }
-
-  const startIndex = startMatch.index + startMatch[0].length - 1;
-  let depth = 0;
-  let endIndex = -1;
-
-  for (let i = startIndex; i < source.length; i += 1) {
-    const ch = source[i];
-    if (ch === "[") {
-      depth += 1;
-    } else if (ch === "]") {
-      depth -= 1;
-      if (depth === 0) {
-        endIndex = i;
-        break;
-      }
-    }
-  }
-
-  if (endIndex === -1) {
-    fail(`Could not parse array values for constant '${constName}'.`);
-  }
-
-  return source.slice(startIndex, endIndex + 1);
 }
 
 function validateAllowedValue(fieldName, value, allowedValues) {
