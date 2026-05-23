@@ -73,70 +73,94 @@ const tris = [
 <p class="results-count" id="results-count" aria-live="polite"></p>
 
 <script>
-  const grid        = document.getElementById('catalogue-grid')   as HTMLElement;
-  const resetBtn    = document.getElementById('reset-filters')    as HTMLButtonElement;
-  const countEl     = document.getElementById('results-count')    as HTMLParagraphElement;
-  const filterSelects = document.querySelectorAll<HTMLSelectElement>('[data-filter]');
-  const triSelect   = document.getElementById('filter-tri')       as HTMLSelectElement;
+  const initFilters = () => {
+    const grid        = document.getElementById('catalogue-grid')   as HTMLElement | null;
+    const resetBtn    = document.getElementById('reset-filters')    as HTMLButtonElement | null;
+    const countEl     = document.getElementById('results-count')    as HTMLParagraphElement | null;
+    const triSelect   = document.getElementById('filter-tri')       as HTMLSelectElement | null;
+    const filterSelects = document.querySelectorAll<HTMLSelectElement>('[data-filter]');
 
-  // Récupère tous les articles une seule fois
-  const allCards = (): HTMLElement[] =>
-    Array.from(grid.querySelectorAll<HTMLElement>('[data-slug]'));
-
-  function applyFilters() {
-    const activeFilters: Record<string, string> = {};
-
-    filterSelects.forEach(sel => {
-      const key = sel.dataset.filter!;
-      if (sel.value) activeFilters[key] = sel.value;
-    });
-
-    const triValue = triSelect.value;
-    const hasActiveFilter = Object.keys(activeFilters).length > 0 || triValue !== '';
-    resetBtn.hidden = !hasActiveFilter;
-
-    // Filtrer
-    let visible = allCards().filter(card => {
-      return Object.entries(activeFilters).every(([key, value]) => {
-        return card.dataset[key] === value;
-      });
-    });
-
-    // Masquer les non-visibles
-    allCards().forEach(card => { card.hidden = true; });
-    visible.forEach(card => { card.hidden = false; });
-
-    // Trier (réordonner dans le DOM)
-    if (triValue === 'prix-asc' || triValue === 'prix-desc') {
-      visible.sort((a, b) => {
-        const pa = parseFloat(a.dataset.prix ?? '0');
-        const pb = parseFloat(b.dataset.prix ?? '0');
-        return triValue === 'prix-asc' ? pa - pb : pb - pa;
-      });
-      visible.forEach(card => grid.appendChild(card));
+    if (!grid || !resetBtn || !countEl || !triSelect) {
+      return;
     }
 
-    // Mettre à jour le compteur
-    const total = allCards().length;
-    const shown = visible.length;
-    countEl.textContent = shown === total
-      ? `${total} article${total > 1 ? 's' : ''}`
-      : `${shown} article${shown > 1 ? 's' : ''} sur ${total}`;
-  }
+    const originalOrder = Array.from(grid.querySelectorAll<HTMLElement>('[data-slug]'));
 
-  // Écouter les changements sur tous les selects
-  filterSelects.forEach(sel => sel.addEventListener('change', applyFilters));
-  triSelect.addEventListener('change', applyFilters);
+    const allCards = (): HTMLElement[] =>
+      Array.from(grid.querySelectorAll<HTMLElement>('[data-slug]'));
 
-  // Réinitialiser
-  resetBtn.addEventListener('click', () => {
-    filterSelects.forEach(sel => { sel.value = ''; });
-    triSelect.value = '';
+    const restoreOriginalOrder = () => {
+      originalOrder.forEach((card) => {
+        grid.appendChild(card);
+      });
+    };
+
+    function applyFilters() {
+      const activeFilters: Record<string, string> = {};
+
+      filterSelects.forEach(sel => {
+        const key = sel.dataset.filter!;
+        if (sel.value) activeFilters[key] = sel.value;
+      });
+
+      const triValue = triSelect.value;
+      const hasActiveFilter = Object.keys(activeFilters).length > 0 || triValue !== '';
+      resetBtn.hidden = !hasActiveFilter;
+
+      // Sans tri actif, on restaure l'ordre initial des cartes.
+      if (triValue === '') {
+        restoreOriginalOrder();
+      }
+
+      // Filtrer
+      let visible = allCards().filter(card => {
+        return Object.entries(activeFilters).every(([key, value]) => {
+          return card.dataset[key] === value;
+        });
+      });
+
+      // Masquer les non-visibles
+      allCards().forEach(card => { card.hidden = true; });
+      visible.forEach(card => { card.hidden = false; });
+
+      // Trier (réordonner dans le DOM)
+      if (triValue === 'prix-asc' || triValue === 'prix-desc') {
+        visible.sort((a, b) => {
+          const pa = parseFloat(a.dataset.prix ?? '0');
+          const pb = parseFloat(b.dataset.prix ?? '0');
+          return triValue === 'prix-asc' ? pa - pb : pb - pa;
+        });
+        visible.forEach(card => grid.appendChild(card));
+      }
+
+      // Mettre à jour le compteur
+      const total = allCards().length;
+      const shown = visible.length;
+      countEl.textContent = shown === total
+        ? `${total} article${total > 1 ? 's' : ''}`
+        : `${shown} article${shown > 1 ? 's' : ''} sur ${total}`;
+    }
+
+    // Écouter les changements sur tous les selects
+    filterSelects.forEach(sel => sel.addEventListener('change', applyFilters));
+    triSelect.addEventListener('change', applyFilters);
+
+    // Réinitialiser
+    resetBtn.addEventListener('click', () => {
+      filterSelects.forEach(sel => { sel.value = ''; });
+      triSelect.value = '';
+      applyFilters();
+    });
+
+    // Afficher le compteur initial
     applyFilters();
-  });
+  };
 
-  // Afficher le compteur initial
-  applyFilters();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFilters, { once: true });
+  } else {
+    initFilters();
+  }
 </script>
 
 <style>

@@ -10,7 +10,8 @@
     "build": "tinacms build && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "ingest:vinted": "node scripts/vinted-ingest.mjs"
+    "ingest:vinted": "node scripts/vinted-ingest.mjs",
+    "sync:articlesVedette": "node scripts/sync-articles-vedette.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

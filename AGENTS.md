@@ -39,6 +39,7 @@ Primary goals:
 |  |- uploads/               # Product images
 |- scripts/
 |  |- vinted-ingest.mjs      # CLI to ingest one Vinted listing into content + images
+|  |- sync-articles-vedette.mjs # Sync accueil articlesVedette with vedette: true articles
 |- src/
 |  |- content.config.ts       # Astro content schemas and enum validation
 |  |- components/
@@ -124,11 +125,18 @@ Ingest one Vinted listing into content and images:
 npm run ingest:vinted -- --url <vinted-url> --slug <slug> --quantite <n> --categorie <key> --theme <key> [--vedette true|false] [--dry-run]
 ```
 
+Synchronize featured homepage references with `vedette: true` article flags:
+
+```bash
+npm run sync:articlesVedette
+```
+
 Notes:
 
 - Ingest validates `categorie` and `theme` against `tina/config.ts`.
 - Slug collisions are blocked.
 - Description formatting is sentence-by-sentence with Markdown hard breaks.
+- `sync:articlesVedette` rewrites `content/singletons/accueil.md` only when counts differ between `vedette: true` articles and `articlesVedette` entries.
 
 ## Validation guidance
 

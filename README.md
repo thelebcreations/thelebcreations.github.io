@@ -70,3 +70,17 @@ Notes:
 - `categorie` and `theme` are validated against allowed values from `tina/config.ts`.
 - The body text is formatted sentence by sentence (split on `.`), with two trailing spaces and a newline per sentence for markdown line breaks.
 - Slug collisions are blocked (existing article file causes an error).
+
+## Sync Featured Articles
+
+Keep `content/singletons/accueil.md` aligned with articles that have `vedette: true`:
+
+```bash
+npm run sync:articlesVedette
+```
+
+Behavior:
+- Reads all files in `content/articles/*.md` with `vedette: true`.
+- Compares that count with entries under `articlesVedette` in `content/singletons/accueil.md`.
+- If counts match, no file is changed.
+- If counts differ, rewrites `articlesVedette` with the current `vedette: true` list.
