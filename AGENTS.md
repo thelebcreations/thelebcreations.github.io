@@ -29,6 +29,7 @@ Primary goals:
 - Search indexes only product pages (`/boutique/[slug]`).
 - Search requires at least 3 characters before querying.
 - Search ranks `disponible` results ahead of `reserve` and `vendu`.
+- Search thumbnails rely on product image metadata (`data-pagefind-meta="image[src]"`) on product detail pages.
 - Root-relative links are used throughout and assume root-domain deployment.
 
 ## Repository layout

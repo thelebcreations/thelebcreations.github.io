@@ -56,6 +56,7 @@ Use this mode to test search behavior locally.
 - Search scope is product detail pages only (`/boutique/[slug]`).
 - Query length must be at least 3 characters.
 - Results prioritize `disponible` articles over `reserve` and `vendu`.
+- Results can show product thumbnails when image metadata is indexed on product pages.
 
 ## Ingest A Vinted Article
 

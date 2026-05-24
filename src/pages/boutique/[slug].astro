@@ -74,8 +74,7 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
   <!-- Contenu principal -->
   <div class="article-layout" data-pagefind-body>
 
-    <span data-pagefind-meta={`image[${images[0]}]`} hidden></span>
-    <span data-pagefind-meta={`statut[${statut}]`} hidden></span>
+    <span class="pagefind-meta-only" data-pagefind-meta="statut">{statut}</span>
 
     <!-- Colonne gauche : galerie -->
     <div class="article-gallery-col">
@@ -139,6 +138,19 @@ const contactUrl = `/contact?sujet=${encodeURIComponent(ctaSujet)}`;
 </Base>
 
 <style>
+  .pagefind-meta-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   /* Fil d'Ariane */
   .breadcrumb {
     display:     flex;
