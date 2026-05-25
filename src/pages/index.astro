@@ -20,6 +20,7 @@ const automatiques = tous.filter(
 );
 
 const articlesVedette = [...depuisAccueil, ...automatiques];
+const [heroArticle, ...remainingArticles] = articlesVedette;
 ---
 
 <Base
@@ -30,26 +31,79 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
   <!-- -------------------------------------------------------------------- -->
   <!-- Hero                                                                  -->
   <!-- -------------------------------------------------------------------- -->
-  <section class="hero">
-    <div class="hero-content">
-      <p class="hero-eyebrow">Fait main avec amour</p>
-      <h1 class="hero-title">
-        Des créations uniques<br />
-        <em>pour les petits et les grands</em>
-      </h1>
-      <p class="hero-description">
-        Chaque pièce est cousue à la main, dans des tissus soigneusement
-        choisis. Bavoirs, lingettes, sacs, accessoires — découvrez notre
-        collection.
-      </p>
-      <a href="/boutique" class="btn-primary">Voir la boutique</a>
+  <div class="hs-shell">
+    <div class="hs-inner">
+      <div class="hs-left">
+        <p class="hero-eyebrow">Fait main avec amour</p>
+        <h1 class="hero-title">
+          Des créations uniques<br />
+          <em>pour les petits et les grands</em>
+        </h1>
+        <p class="hero-description">
+          Chaque pièce est cousue à la main, dans des tissus soigneusement
+          choisis. <br />
+          Bavoirs, lingettes, sacs, accessoires — découvrez notre
+          collection.
+        </p>
+        <a href="/boutique" class="btn-primary">Voir la boutique</a>
+      </div>
+      {heroArticle?.data.images[0] && (
+        <a href={`/boutique/${heroArticle.id}`} class="hs-right" aria-label={heroArticle.data.titre}>
+          <img
+            src={heroArticle.data.images[0]}
+            alt={heroArticle.data.titre}
+            class="hs-img"
+            loading="eager"
+            decoding="async"
+          />
+        </a>
+      )}
     </div>
-  </section>
+    <div class="hs-trust">
+      <div class="hs-trust-item">
+        <span class="hs-trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+            <line x1="20" y1="4" x2="8.12" y2="15.88"/>
+            <line x1="14.47" y1="14.48" x2="20" y2="20"/>
+            <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+          </svg>
+        </span>
+        <span class="hs-trust-text">
+          <strong>Fait main</strong>
+          <span class="hs-trust-desc">Cousu à la main, pièce par pièce</span>
+        </span>
+      </div>
+      <div class="hs-trust-item">
+        <span class="hs-trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </span>
+        <span class="hs-trust-text">
+          <strong>Pièces uniques</strong>
+          <span class="hs-trust-desc">Petites séries et créations exclusives</span>
+        </span>
+      </div>
+      <div class="hs-trust-item">
+        <span class="hs-trust-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </span>
+        <span class="hs-trust-text">
+          <strong>Tissus choisis</strong>
+          <span class="hs-trust-desc">Matières soigneusement sélectionnées</span>
+        </span>
+      </div>
+    </div>
+  </div>
 
   <!-- -------------------------------------------------------------------- -->
   <!-- Articles en vedette                                                   -->
   <!-- -------------------------------------------------------------------- -->
-  {articlesVedette.length > 0 && (
+  {remainingArticles.length > 0 && (
     <section class="featured-section">
       <div class="section-header">
         <h2 class="section-title">Nos créations</h2>
@@ -57,7 +111,7 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
       </div>
 
       <div class="articles-grid">
-        {articlesVedette.map(article => (
+        {remainingArticles.map(article => (
           <ArticleCard
             slug={article.id}
             titre={article.data.titre}
@@ -96,16 +150,113 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
   /* ------------------------------------------------------------------ */
   /* Hero                                                                 */
   /* ------------------------------------------------------------------ */
-  .hero {
-    text-align: center;
-    max-width:  58rem;
-    margin:     0 auto;
+  /* Hero shell */
+  .hs-shell {
+    border:        1px solid var(--color-border, #E2DDD5);
+    border-radius: 0.75rem;
+    overflow:      hidden;
+    margin-bottom: 2rem;
   }
 
-  .hero-content {
-    padding: 0;
-    max-width: 58rem;
-    margin: 0 auto;
+  .hs-inner {
+    display:     flex;
+    align-items: stretch;
+    min-height:  300px;
+  }
+
+  .hs-left {
+    flex:    1;
+    min-width: 0;
+    padding: 2.5rem 2rem;
+  }
+
+  .hs-right {
+    position:               relative;
+    flex:                   0 0 260px;
+    overflow:               hidden;
+    display:                block;
+    text-decoration:        none;
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+  }
+
+  /* fade the left edge of the image into the page background */
+  .hs-right::before {
+    content:        '';
+    position:       absolute;
+    inset:          0 auto 0 0;
+    width:          0.75rem;
+    background:     linear-gradient(to right, var(--color-bg, #FDFBF7), transparent);
+    z-index:        1;
+    pointer-events: none;
+  }
+
+  .hs-img {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    display:    block;
+    transition: transform 0.4s ease;
+  }
+
+  .hs-right:hover .hs-img {
+    transform: scale(1.03);
+  }
+
+  .hs-trust {
+    display:    flex;
+    border-top: 1px solid var(--color-border, #E2DDD5);
+    background: color-mix(in srgb, var(--color-accent, #E6997C) 4%, var(--color-bg, #FDFBF7));
+  }
+
+  .hs-trust-item {
+    flex:        1;
+    display:     flex;
+    align-items: center;
+    gap:         0.75rem;
+    margin:      0;
+    padding:     0.875rem 1.25rem;
+  }
+
+  .hs-trust-item + .hs-trust-item {
+    border-left: 1px solid var(--color-border, #E2DDD5);
+  }
+
+  .hs-trust-icon {
+    flex-shrink:     0;
+    width:           1.75rem;
+    height:          1.75rem;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    border-radius:   50%;
+    background:      color-mix(in srgb, var(--color-accent, #E6997C) 12%, transparent);
+    color:           var(--color-accent, #E6997C);
+    margin-inline:   0.375rem;
+  }
+
+  .hs-trust-icon svg {
+    width:  0.95rem;
+    height: 0.95rem;
+  }
+
+  .hs-trust-text {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.15rem;
+  }
+
+  .hs-trust-item strong {
+    font-weight: 600;
+    font-size:   0.9375rem;
+    color:       var(--color-text, #2B2D42);
+    margin:      0;
+  }
+
+  .hs-trust-desc {
+    font-size:   0.8125rem;
+    color:       var(--color-text-muted, #6B6D80);
+    line-height: 1.4;
   }
 
   .hero-eyebrow {
@@ -114,16 +265,16 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color:          var(--color-secondary, #739371);
-    margin:         0 0 0.75rem;
+    margin:         0 0 1.25rem;
     white-space:    nowrap;
   }
 
   .hero-title {
     font-family:  var(--font-display, serif);
-    font-size:    2.4rem;
+    font-size:    3.1rem;
     font-weight:  600;
     line-height:  1.03;
-    margin:       0 0 0;
+    margin:       0 0 1.4rem;
     color:        var(--color-text, #2B2D42);
   }
 
@@ -137,7 +288,7 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
     font-size:   1.0625rem;
     color:       var(--color-text-muted, #6B6D80);
     line-height: 1.7;
-    margin:      0 0 1.6rem;
+    margin:      0 0 2.2rem;
   }
 
   /* ------------------------------------------------------------------ */
@@ -251,12 +402,17 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
   /* Responsive                                                           */
   /* ------------------------------------------------------------------ */
   @media (max-width: 640px) {
-    .hero {
-      max-width: 42rem;
+    .hs-right {
+      display: none;
     }
 
-    .hero-content {
-      max-width: 42rem;
+    .hs-trust {
+      flex-direction: column;
+    }
+
+    .hs-trust-item + .hs-trust-item {
+      border-left:  none;
+      border-top:   1px solid var(--color-border, #E2DDD5);
     }
 
     .hero-eyebrow {
@@ -269,9 +425,4 @@ const articlesVedette = [...depuisAccueil, ...automatiques];
     }
   }
 
-  @media (min-width: 768px) {
-    .hero-title br {
-      display: none;
-    }
-  }
 </style>
