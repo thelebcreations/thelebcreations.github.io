@@ -74,16 +74,12 @@
       Aucune création trouvée pour ce mot-clé.
     </p>
 
-    <p id="search-error" class="search-state-msg" hidden>
-      La recherche est momentanément indisponible. Réessayez après un build complet.
-    </p>
-
     <ul id="search-result-list" class="search-result-list" hidden></ul>
   </div>
 </div>
 
 <script>
-  type SearchState = 'hint' | 'min' | 'loading' | 'empty' | 'error' | 'results';
+  type SearchState = 'hint' | 'min' | 'loading' | 'empty' | 'results';
 
   const MIN_QUERY_LENGTH = 3;
   const MAX_RESULT_FETCH = 20;
@@ -109,7 +105,6 @@
   const minState = document.getElementById('search-min') as HTMLElement | null;
   const loading = document.getElementById('search-loading') as HTMLElement | null;
   const empty = document.getElementById('search-empty') as HTMLElement | null;
-  const error = document.getElementById('search-error') as HTMLElement | null;
   const resultList = document.getElementById('search-result-list') as HTMLUListElement | null;
 
   if (
@@ -121,29 +116,37 @@
     !minState ||
     !loading ||
     !empty ||
-    !error ||
     !resultList
   ) {
     throw new Error('SearchModal initialization failed: required elements are missing.');
   }
 
+  const modalEl = modal!;
+  const backdropEl = backdrop!;
+  const inputEl = input!;
+  const closeBtnEl = closeBtn!;
+  const hintEl = hint!;
+  const minStateEl = minState!;
+  const loadingEl = loading!;
+  const emptyEl = empty!;
+  const resultListEl = resultList!;
+
   function showState(state: SearchState) {
-    hint.hidden = state !== 'hint';
-    minState.hidden = state !== 'min';
-    loading.hidden = state !== 'loading';
-    empty.hidden = state !== 'empty';
-    error.hidden = state !== 'error';
-    resultList.hidden = state !== 'results';
+    hintEl.hidden = state !== 'hint';
+    minStateEl.hidden = state !== 'min';
+    loadingEl.hidden = state !== 'loading';
+    emptyEl.hidden = state !== 'empty';
+    resultListEl.hidden = state !== 'results';
   }
 
   function resetResults() {
-    resultList.innerHTML = '';
-    resultList.hidden = true;
+    resultListEl.innerHTML = '';
+    resultListEl.hidden = true;
     activeIndex = -1;
   }
 
   function getFocusableElements() {
-    const all = modal.querySelectorAll<HTMLElement>(
+    const all = modalEl.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
 
@@ -158,18 +161,18 @@
   function openModal(trigger?: HTMLElement) {
     lastFocusedBeforeOpen = trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
 
-    modal.hidden = false;
-    backdrop.hidden = false;
-    backdrop.setAttribute('aria-hidden', 'false');
+    modalEl.hidden = false;
+    backdropEl.hidden = false;
+    backdropEl.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    input.focus();
+    inputEl.focus();
     activeIndex = -1;
   }
 
   function closeModal() {
-    modal.hidden = true;
-    backdrop.hidden = true;
-    backdrop.setAttribute('aria-hidden', 'true');
+    modalEl.hidden = true;
+    backdropEl.hidden = true;
+    backdropEl.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
 
     if (debounceTimer) {
@@ -178,7 +181,7 @@
     }
 
     requestId += 1;
-    input.value = '';
+    inputEl.value = '';
     resetResults();
     showState('hint');
 
@@ -218,7 +221,7 @@
   }
 
   function getItems() {
-    return Array.from(resultList.querySelectorAll<HTMLLIElement>('.search-result-item'));
+    return Array.from(resultListEl.querySelectorAll<HTMLLIElement>('.search-result-item'));
   }
 
   function setActive(index: number) {
@@ -235,7 +238,7 @@
   }
 
   function renderResults(dataArr: any[]) {
-    resultList.innerHTML = '';
+    resultListEl.innerHTML = '';
 
     dataArr.forEach((data: any) => {
       const li = document.createElement('li');
@@ -291,7 +294,7 @@
       link.addEventListener('click', () => closeModal());
 
       li.appendChild(link);
-      resultList.appendChild(li);
+      resultListEl.appendChild(li);
     });
   }
 
@@ -320,7 +323,7 @@
 
     if (!ready) {
       resetResults();
-      showState('error');
+      showState('empty');
       return;
     }
 
@@ -333,7 +336,7 @@
       }
       console.warn('Search query failed.', e);
       resetResults();
-      showState('error');
+      showState('empty');
       return;
     }
 
@@ -380,16 +383,16 @@
     activeIndex = -1;
   }
 
-  input.addEventListener('input', () => {
+  inputEl.addEventListener('input', () => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
     debounceTimer = setTimeout(() => {
-      void runSearch(input.value);
+      void runSearch(inputEl.value);
     }, 280);
   });
 
-  input.addEventListener('keydown', (e) => {
+  inputEl.addEventListener('keydown', (e) => {
     const items = getItems();
 
     if (e.key === 'ArrowDown') {
@@ -418,8 +421,8 @@
     }
   });
 
-  closeBtn.addEventListener('click', closeModal);
-  backdrop.addEventListener('click', closeModal);
+  closeBtnEl.addEventListener('click', closeModal);
+  backdropEl.addEventListener('click', closeModal);
 
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement | null;
@@ -434,7 +437,7 @@
   });
 
   document.addEventListener('keydown', (e) => {
-    if (modal.hidden) {
+    if (modalEl.hidden) {
       return;
     }
 
@@ -459,7 +462,7 @@
     const current = document.activeElement as HTMLElement | null;
 
     if (e.shiftKey) {
-      if (current === first || current === modal) {
+      if (current === first || current === modalEl) {
         e.preventDefault();
         last.focus();
       }

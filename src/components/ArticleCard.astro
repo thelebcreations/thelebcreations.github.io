@@ -1,5 +1,4 @@
 ---
-import StatusBadge from './StatusBadge.astro';
 import type { ArticleStatut, ArticleCategorie, ArticleTheme } from '../content.config';
 import { getCategoryLabel, getThemeLabel, getStatutLabel } from '../utils/taxonomy';
 
@@ -42,7 +41,6 @@ const soldLabel = getStatutLabel('vendu');
     <div class="card-body">
       <div class="card-header">
         <h2 class="card-titre">{titre}</h2>
-        <StatusBadge statut={statut} />
       </div>
 
       <div class="card-meta">
