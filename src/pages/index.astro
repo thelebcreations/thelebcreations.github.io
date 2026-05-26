@@ -20,7 +20,6 @@ const automatiques = tous.filter(
 );
 
 const articlesVedette = [...depuisAccueil, ...automatiques];
-const [heroArticle, ...remainingArticles] = articlesVedette;
 ---
 
 <Base
@@ -34,7 +33,6 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
   <div class="hs-shell">
     <div class="hs-inner">
       <div class="hs-left">
-        <p class="hero-eyebrow">Fait main avec amour</p>
         <h1 class="hero-title">
           Des créations uniques<br />
           <em>pour les petits et les grands</em>
@@ -45,19 +43,11 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
           Bavoirs, lingettes, sacs, accessoires — découvrez notre
           collection.
         </p>
-        <a href="/boutique" class="btn-primary">Voir la boutique</a>
       </div>
-      {heroArticle?.data.images[0] && (
-        <a href={`/boutique/${heroArticle.id}`} class="hs-right" aria-label={heroArticle.data.titre}>
-          <img
-            src={heroArticle.data.images[0]}
-            alt={heroArticle.data.titre}
-            class="hs-img"
-            loading="eager"
-            decoding="async"
-          />
-        </a>
-      )}
+      <div class="hs-right">
+        <p class="hero-eyebrow">Fait main<br />avec amour</p>
+        <a href="/boutique" class="btn-primary">Découvrir la collection</a>
+      </div>
     </div>
     <div class="hs-trust">
       <div class="hs-trust-item">
@@ -103,7 +93,7 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
   <!-- -------------------------------------------------------------------- -->
   <!-- Articles en vedette                                                   -->
   <!-- -------------------------------------------------------------------- -->
-  {remainingArticles.length > 0 && (
+  {articlesVedette.length > 0 && (
     <section class="featured-section">
       <div class="section-header">
         <h2 class="section-title">Nos créations</h2>
@@ -111,7 +101,7 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
       </div>
 
       <div class="articles-grid">
-        {remainingArticles.map(article => (
+        {articlesVedette.map(article => (
           <ArticleCard
             slug={article.id}
             titre={article.data.titre}
@@ -161,46 +151,23 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
   .hs-inner {
     display:     flex;
     align-items: stretch;
-    min-height:  300px;
   }
 
   .hs-left {
-    flex:    1;
+    flex:      2;
     min-width: 0;
-    padding: 2.5rem 2rem;
+    padding:   2.5rem 2rem 0rem;
   }
 
   .hs-right {
-    position:               relative;
-    flex:                   0 0 260px;
-    overflow:               hidden;
-    display:                block;
-    text-decoration:        none;
-    border-top-left-radius: 0.75rem;
-    border-bottom-left-radius: 0.75rem;
-  }
-
-  /* fade the left edge of the image into the page background */
-  .hs-right::before {
-    content:        '';
-    position:       absolute;
-    inset:          0 auto 0 0;
-    width:          0.75rem;
-    background:     linear-gradient(to right, var(--color-bg, #FDFBF7), transparent);
-    z-index:        1;
-    pointer-events: none;
-  }
-
-  .hs-img {
-    width:      100%;
-    height:     100%;
-    object-fit: cover;
-    display:    block;
-    transition: transform 0.4s ease;
-  }
-
-  .hs-right:hover .hs-img {
-    transform: scale(1.03);
+    flex:            1;
+    display:         flex;
+    flex-direction:  column;
+    align-items:     center;
+    justify-content: center;
+    gap:             1.25rem;
+    padding:         2.5rem 2rem;
+    text-align:      center;
   }
 
   .hs-trust {
@@ -260,10 +227,12 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
   }
 
   .hero-eyebrow {
-    font-size:      0.75rem;
-    font-weight:    500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family:    "Sacramento", cursive;
+    font-size:      3.05rem;
+    font-weight:    400;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    line-height:    1;
     color:          var(--color-secondary, #739371);
     margin:         0 0 1.25rem;
     white-space:    nowrap;
@@ -273,7 +242,7 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
     font-family:  var(--font-display, serif);
     font-size:    3.1rem;
     font-weight:  600;
-    line-height:  1.03;
+    line-height:  1.31;
     margin:       0 0 1.4rem;
     color:        var(--color-text, #2B2D42);
   }
@@ -288,7 +257,7 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
     font-size:   1.0625rem;
     color:       var(--color-text-muted, #6B6D80);
     line-height: 1.7;
-    margin:      0 0 2.2rem;
+    margin:      0 0 2.1rem;
   }
 
   /* ------------------------------------------------------------------ */
@@ -372,7 +341,6 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
     color:           #fff;
     padding:         0.7rem 1.75rem;
     border-radius:   0.5rem;
-    font-size:       0.9375rem;
     font-weight:     500;
     text-decoration: none;
     transition:      background 0.2s, transform 0.1s;
@@ -402,8 +370,13 @@ const [heroArticle, ...remainingArticles] = articlesVedette;
   /* Responsive                                                           */
   /* ------------------------------------------------------------------ */
   @media (max-width: 640px) {
+    .hs-inner {
+      flex-direction: column;
+    }
+
     .hs-right {
-      display: none;
+      flex:        unset;
+      padding-top: 1.5rem;
     }
 
     .hs-trust {
