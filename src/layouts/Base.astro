@@ -18,7 +18,7 @@ const SITE_TITLE = "TheLeb Créations";
 const pageTitle = titre === SITE_TITLE ? titre : `${titre} — ${SITE_TITLE}`;
 
 const nav = [
-  { href: "/boutique", label: "Boutique" },
+  { href: "/boutique", label: "La collection" },
   { href: "/a-propos", label: "À propos" },
   { href: "/contact", label: "Contact" },
 ];
@@ -136,10 +136,20 @@ const nav = [
     <!-- Pied de page                                                        -->
     <!-- ------------------------------------------------------------------ -->
     <footer class="site-footer">
-      <p class="footer-brand">TheLeb <em>Créations</em></p>
-      <p class="footer-tagline">Chaque pièce est unique, faite avec soin.</p>
-      <a href="/contact" class="footer-contact">Nous contacter</a>
-      <p class="footer-copy">© {new Date().getFullYear()} TheLeb Créations</p>
+      <div class="footer-inner">
+        <div class="footer-col">
+          <p class="footer-brand">TheLeb <em>Créations</em></p>
+          <p class="footer-tagline">Fait main<br />avec amour</p>
+        </div>
+        <div class="footer-col footer-col-nav">
+          <ul class="footer-nav-links" role="list">
+            <li><a href="/boutique">La collection</a></li>
+            <li><a href="/a-propos">À propos</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+          <p class="footer-copy">&copy; {new Date().getFullYear()} TheLeb Créations</p>
+        </div>
+      </div>
     </footer>
 
     <SearchModal />
@@ -400,52 +410,79 @@ const nav = [
    * Footer
    * ------------------------------------------------------------------------ */
   .site-footer {
-    border-top: 1px solid var(--color-border);
-    background-color: var(--color-surface);
-    padding: 3rem var(--padding-x) 2rem;
-    text-align: center;
+    border-top:  1px solid var(--color-border);
+    background:  color-mix(in srgb, var(--color-accent) 4%, var(--color-bg));
+  }
+
+  .footer-inner {
+    max-width:     var(--max-width);
+    margin-inline: auto;
+    padding:       0.1rem var(--padding-x);
+    display:       flex;
+    align-items:   stretch;
+  }
+
+  .footer-col {
+    flex:    1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap:     0.5rem;
+    padding: 0.2rem 1.5rem;
+  }
+
+  .footer-col-nav {
+    justify-content: space-between;
+    padding-top: 0.6rem;
   }
 
   .footer-brand {
     font-family: var(--font-display);
-    font-size: 1.375rem;
+    font-size:   1.375rem;
     font-weight: 600;
-    margin: 0;
+    margin:      0;
+    color:       var(--color-text);
   }
   .footer-brand em {
-    font-style: italic;
+    font-style:  italic;
     font-weight: 550;
-    color: var(--color-secondary);
+    color:       var(--color-secondary);
   }
 
   .footer-tagline {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    margin: 0;
+    font-family: "Sacramento", cursive;
+    font-size:   1.9rem;
+    font-weight: 400;
+    line-height: 0.75;
+    color:       var(--color-secondary);
+    margin:      0;
   }
 
-  .footer-contact {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-accent);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.2s;
+  .footer-nav-links {
+    list-style: none;
+    margin:     0;
+    padding:    0;
+    display:    flex;
+    flex-direction: column;
+    gap:        0.35rem;
   }
-  .footer-contact:hover {
+
+  .footer-nav-links a {
+    font-size:            0.9375rem;
+    font-weight:          500;
+    color:                var(--color-accent);
+    text-decoration:      underline;
+    text-underline-offset: 3px;
+    transition:           color 0.2s;
+  }
+  .footer-nav-links a:hover {
     color: var(--color-accent-hover);
   }
 
   .footer-copy {
-    margin-top: 1rem;
     font-size: 0.75rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0;
+    color:     var(--color-text-muted);
+    margin:    0;
   }
 
   /* -------------------------------------------------------------------------
@@ -457,6 +494,9 @@ const nav = [
     }
     .nav-toggle {
       display: flex;
+    }
+    .footer-inner {
+      flex-direction: column;
     }
   }
 </style>
