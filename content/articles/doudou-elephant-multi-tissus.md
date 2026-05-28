@@ -11,7 +11,7 @@ images:
   - /uploads/doudou-elephant-multi-tissus-3.webp
   - /uploads/doudou-elephant-multi-tissus-4.webp
   - /uploads/doudou-elephant-multi-tissus-5.webp
-vedette: true
+vedette: false
 ---
 Doudou éléphant , fait main.  
 J’ai mis un papier bruissement dans chaque oreille pour le plaisir des petits.  

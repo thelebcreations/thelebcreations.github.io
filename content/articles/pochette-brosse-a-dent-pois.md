@@ -9,7 +9,7 @@ images:
   - /uploads/pochette-brosse-a-dent-pois-1.webp
   - /uploads/pochette-brosse-a-dent-pois-2.webp
   - /uploads/pochette-brosse-a-dent-pois-3.webp
-vedette: true
+vedette: false
 ---
 Pochette nomade pour brosse à dents et dentifrice.  
 On peut y glisser 2 brosses à dents et le dentifrice.  

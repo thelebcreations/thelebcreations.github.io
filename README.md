@@ -1,6 +1,6 @@
 # TheLeb Créations
 
-Boutique Créations Faites Main — a static e-commerce website for handmade creations. Built for zero-cost operation and easy content management.
+Collection Créations Faites Main — a static e-commerce website for handmade creations. Built for zero-cost operation and easy content management.
 
 ## 🚀 Tech Stack
 
@@ -13,7 +13,7 @@ Boutique Créations Faites Main — a static e-commerce website for handmade cre
 ## 📂 Features & Pages
 
 - **`/` (Accueil):** Hero section, featured creations, and quick links.
-- **`/boutique` (Catalogue):** Complete catalog with client-side filtering and sorting.
+- **`/boutique` (Collection):** Complete catalog with client-side filtering and sorting.
 - **`/boutique/[slug]` (Article):** Individual item details, image gallery, and availability status.
 - **Search modal:** Client-side search powered by Pagefind (indexed at build time).
 - **`/a-propos` (À propos):** Presentation of the creator.

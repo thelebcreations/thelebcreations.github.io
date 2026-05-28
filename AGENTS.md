@@ -159,7 +159,7 @@ npm run build
 
 For functional UI/content updates, also verify manually in dev mode:
 
-- Catalogue filtering and status badges
+- Collection filtering and status badges
 - Product page CTA behavior by status
 - Contact subject prefill via `?sujet=`
 - Tina admin access at `/admin/index.html`

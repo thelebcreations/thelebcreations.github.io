@@ -9,7 +9,7 @@ images:
   - /uploads/bavoirs-espace-rose-abricot-1.webp
   - /uploads/bavoirs-espace-rose-abricot-2.webp
   - /uploads/bavoirs-espace-rose-abricot-3.webp
-vedette: true
+vedette: false
 ---
 Bavoir fait main , une face coton et l'autre éponge de bambou corail.  
 Fermeture par pression.  

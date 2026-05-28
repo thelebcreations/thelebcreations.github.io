@@ -8,7 +8,7 @@ statut: disponible
 images:
   - /uploads/pere-noel-deco-a-accrocher-1.webp
   - /uploads/pere-noel-deco-a-accrocher-2.webp
-vedette: true
+vedette: false
 ---
 Père Noël, fait main.  
 On peut les accrocher dans le sapin ou en déco de table.  
